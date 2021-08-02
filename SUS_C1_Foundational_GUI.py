@@ -1,7 +1,8 @@
 """
 The States of the United States
 Component 01 - Foundational GUI
-Version 2.0 - Created Buttons Frame and Four Currently Non-Functioning Buttons
+Version 2.1 - Changed Button Dimensions from 20 width to 15 and 10 height to 2,
+along with padx and pady to 1.
 Finn Wescombe
 29/07/21
 """
@@ -35,32 +36,35 @@ class Menu:
         self.frm_m_buttons = Frame(self.frm_m, width=100, height=100, bg=bg_colour)
         self.frm_m_buttons.grid(row=1)
 
+        # So that Width and Height is Measured in Pixels, Create 1x1 Image
+        pixel_image = PhotoImage(width=1, height=1)
+
         # Play Game Button (Row 1 / Row 0)
         self.btn_m_play = Button(self.frm_m_buttons,
                                  text="Play",
-                                 width=20, height=10,
-                                 padx=10, pady=10)
+                                 width=15, height=2,
+                                 padx=1, pady=1)
         self.btn_m_play.grid(row=0)
 
         # View Cartogram Button (Row 1 / Row 1)
         self.btn_m_cartogram = Button(self.frm_m_buttons,
                                       text="View Cartogram",
-                                      width=20, height=10,
-                                      padx=10, pady=10)
+                                      width=15, height=2,
+                                      padx=1, pady=1)
         self.btn_m_cartogram.grid(row=1)
 
         # Instructions Button (Row 1 / Row 2)
         self.btn_m_instructions = Button(self.frm_m_buttons,
                                          text="Instructions",
-                                         width=20, height=10,
-                                         padx=10, pady=10)
+                                         width=15, height=2,
+                                         padx=1, pady=1)
         self.btn_m_instructions.grid(row=2)
 
         # View Past Results Button (Row 1 / Row 3)
         self.btn_m_results = Button(self.frm_m_buttons,
                                     text="View Past Results",
-                                    width=20, height=10,
-                                    padx=10, pady=10)
+                                    width=15, height=2,
+                                    padx=1, pady=1)
         self.btn_m_results.grid(row=3)
 
 
