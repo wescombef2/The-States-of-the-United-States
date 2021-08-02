@@ -1,8 +1,10 @@
 """
 The States of the United States
 Component 01 - Foundational GUI
-Version 2.1 - Changed Button Dimensions from 20 width to 15 and 10 height to 2,
-along with padx and pady to 1.
+Version 3.0 - Added Instructions GUI Class that opens when btn_m_instructions is
+pressed. So long as it is open, the button is disabled, but it becomes re-enabled
+when the dismiss button is pressed or window close button, both of which closes the
+window.
 Finn Wescombe
 29/07/21
 """
@@ -57,7 +59,8 @@ class Menu:
         self.btn_m_instructions = Button(self.frm_m_buttons,
                                          text="Instructions",
                                          width=15, height=2,
-                                         padx=1, pady=1)
+                                         padx=1, pady=1,
+                                         command=self.fnc_get_i)
         self.btn_m_instructions.grid(row=2)
 
         # View Past Results Button (Row 1 / Row 3)
@@ -66,6 +69,66 @@ class Menu:
                                     width=15, height=2,
                                     padx=1, pady=1)
         self.btn_m_results.grid(row=3)
+
+    def fnc_get_i(self):
+        i = Instructions(self)
+        i.lbl_i_text.configure(text="<<< Placeholder >>>")
+
+
+# Menu GUI Class
+class Instructions:
+    # Initialize Function
+    def __init__(self, menu):
+        # Define Formatting Variables
+        bg_colour = "grey"
+
+        # Disable Button in Menu
+        menu.btn_m_instructions.configure(state=DISABLED)
+
+        # Create Window
+        self.box_i = Toplevel()
+        self.box_i.protocol('WM_DELETE_WINDOW', partial(self.fnc_i_close, menu))
+
+        # Main Frame
+        self.frm_i = Frame(width=100, height=100, bg=bg_colour)
+        self.frm_i.grid()
+
+        # Heading (Row 0)
+        self.lbl_i_heading = Label(self.frm_i,
+                                   text="Instructions",
+                                   font=("Arial", "16", "bold"),
+                                   bg=bg_colour,
+                                   padx=10, pady=5)
+        self.lbl_i_heading.grid(row=0)
+
+        # Instruction Text (Row 1)
+        self.lbl_i_text = Label(self.frm_i,
+                                   text="",
+                                   font=("Arial", "12"),
+                                   bg=bg_colour,
+                                   padx=10, pady=10)
+        self.lbl_i_text.grid(row=1)
+
+        # Footer Frame (Row 2)
+        self.frm_i_footer = Frame(self.frm_i, width=100, height=20, bg=bg_colour)
+        self.frm_i_footer.grid(row=1)
+
+        # So that Width and Height is Measured in Pixels, Create 1x1 Image
+        pixel_image = PhotoImage(width=1, height=1)
+
+        # Close Button (Row 2 / Row 0)
+        self.btn_i_close = Button(self.frm_i_footer,
+                                 text="Close",
+                                 width=10, height=2,
+                                 padx=1, pady=1,
+                                 command=partial(self.fnc_i_close, menu))
+        self.btn_i_close.grid(row=0)
+
+    def fnc_i_close(self, menu):
+        # Re-enable Help Button
+        menu.btn_m_instructions.configure(state=NORMAL)
+        # Close Window
+        self.box_i.destroy()
 
 
 # Main Routine
