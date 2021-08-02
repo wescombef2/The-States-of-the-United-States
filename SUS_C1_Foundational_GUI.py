@@ -1,10 +1,8 @@
 """
 The States of the United States
 Component 01 - Foundational GUI
-Version 3.0 - Added Instructions GUI Class that opens when btn_m_instructions is
-pressed. So long as it is open, the button is disabled, but it becomes re-enabled
-when the dismiss button is pressed or window close button, both of which closes the
-window.
+Version 3.1 - Added 'self.box_i' to frm_i Frame creation and changed frm_i_footer
+grid row from 1 to 2.
 Finn Wescombe
 29/07/21
 """
@@ -90,7 +88,7 @@ class Instructions:
         self.box_i.protocol('WM_DELETE_WINDOW', partial(self.fnc_i_close, menu))
 
         # Main Frame
-        self.frm_i = Frame(width=100, height=100, bg=bg_colour)
+        self.frm_i = Frame(self.box_i, width=100, height=100, bg=bg_colour)
         self.frm_i.grid()
 
         # Heading (Row 0)
@@ -111,7 +109,7 @@ class Instructions:
 
         # Footer Frame (Row 2)
         self.frm_i_footer = Frame(self.frm_i, width=100, height=20, bg=bg_colour)
-        self.frm_i_footer.grid(row=1)
+        self.frm_i_footer.grid(row=2)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
         pixel_image = PhotoImage(width=1, height=1)
