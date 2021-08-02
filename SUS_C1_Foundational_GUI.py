@@ -1,8 +1,7 @@
 """
 The States of the United States
 Component 01 - Foundational GUI
-Version 3.1 - Added 'self.box_i' to frm_i Frame creation and changed frm_i_footer
-grid row from 1 to 2.
+Version 4.0 - Added Cartogram Window and Functionality Based off of Instructions.
 Finn Wescombe
 29/07/21
 """
@@ -50,7 +49,8 @@ class Menu:
         self.btn_m_cartogram = Button(self.frm_m_buttons,
                                       text="View Cartogram",
                                       width=15, height=2,
-                                      padx=1, pady=1)
+                                      padx=1, pady=1,
+                                      command=self.fnc_get_c)
         self.btn_m_cartogram.grid(row=1)
 
         # Instructions Button (Row 1 / Row 2)
@@ -72,8 +72,11 @@ class Menu:
         i = Instructions(self)
         i.lbl_i_text.configure(text="<<< Placeholder >>>")
 
+    def fnc_get_c(self):
+        c = Cartogram(self)
 
-# Menu GUI Class
+
+# Instructions GUI Class
 class Instructions:
     # Initialize Function
     def __init__(self, menu):
@@ -127,6 +130,58 @@ class Instructions:
         menu.btn_m_instructions.configure(state=NORMAL)
         # Close Window
         self.box_i.destroy()
+
+
+# Cartogram GUI Class
+class Cartogram:
+    # Initialize Function
+    def __init__(self, menu):
+        # Define Formatting Variables
+        bg_colour = "grey"
+
+        # Disable Button in Menu
+        menu.btn_m_cartogram.configure(state=DISABLED)
+
+        # Create Window
+        self.box_c = Toplevel()
+        self.box_c.protocol('WM_DELETE_WINDOW', partial(self.fnc_c_close, menu))
+
+        # Main Frame
+        self.frm_c = Frame(self.box_c, width=100, height=100, bg=bg_colour)
+        self.frm_c.grid()
+
+        # Heading (Row 0)
+        self.lbl_c_heading = Label(self.frm_c,
+                                   text="Cartogram",
+                                   font=("Arial", "16", "bold"),
+                                   bg=bg_colour,
+                                   padx=10, pady=5)
+        self.lbl_c_heading.grid(row=0)
+
+        # Cartogram Frame (Row 1)
+        self.frm_c_cartogram = Frame(self.frm_c, width=100, height=100, bg=bg_colour)
+        self.frm_c_cartogram.grid(row=2)
+
+        # Footer Frame (Row 2)
+        self.frm_c_footer = Frame(self.frm_c, width=100, height=20, bg=bg_colour)
+        self.frm_c_footer.grid(row=2)
+
+        # So that Width and Height is Measured in Pixels, Create 1x1 Image
+        pixel_image = PhotoImage(width=1, height=1)
+
+        # Close Button (Row 2 / Row 0)
+        self.btn_c_close = Button(self.frm_c_footer,
+                                 text="Close",
+                                 width=10, height=2,
+                                 padx=1, pady=1,
+                                 command=partial(self.fnc_c_close, menu))
+        self.btn_c_close.grid(row=0)
+
+    def fnc_c_close(self, menu):
+        # Re-enable Help Button
+        menu.btn_m_cartogram.configure(state=NORMAL)
+        # Close Window
+        self.box_c.destroy()
 
 
 # Main Routine
