@@ -1,8 +1,8 @@
 """
 The States of the United States
 Component 02 - State Map GUI
-Version 1.0 - Formed State Class that Creates a Button displayed in Cartogram Test
-Window
+Version 2.0 - Formed Function that Creates Multiple State Objects Using Row/Column
+Indexes.
 Finn Wescombe
 03/08/21
 """
@@ -32,14 +32,21 @@ class Cartogram_Test_Window:
         self.frm_c_footer = Frame(self.frm_c, width=100, height=20, bg=bg_colour)
         self.frm_c_footer.grid(row=2)
 
-        # Create State
-        test_state = State(self, "placeholder")
+        # Create State List
+        states = [["A", [1, 1]], ["B", [1, 2]], ["C", [1, 3]],
+                  ["D", [2, 1]], ["E", [2, 2]], ["F", [2, 3]],
+                  ["G", [3, 1]], ["H", [3, 2]], ["I", [3, 3]]]
+        self.fnc_generate_states(states)
 
+    # Generate States Test Function
+    def fnc_generate_states(self, list):
+        for i in list:
+            test_state = State(self, i[0], i[1][0], i[1][1])
 
 # State Class
 class State:
 
-    def __init__(self, frame, name):
+    def __init__(self, frame, name, row, column):
 
         # Define Format Variables
         bg_colour = "red"
@@ -53,7 +60,7 @@ class State:
                                 borderwidth=2,
                                 relief="sunken",
                                 state=NORMAL)
-        self.btn_state.grid(row=0)
+        self.btn_state.grid(row=row, column=column)
 
 
 # Main Routine
