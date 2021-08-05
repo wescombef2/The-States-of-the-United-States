@@ -1,9 +1,12 @@
 """
 The States of the United States
 Component 03 - Game Cartogram
-Version 1.0 - Integrate the State Map into the Game Window
+Version 1.1 - I have shifted the View Cartogram Button from the Menu Window
+to the Game Window. This way, there will not be two instances of the generate
+state function.
+
 Finn Wescombe
-03/08/21
+05/08/21
 """
 
 # Import Tools
@@ -46,13 +49,7 @@ class Menu:
                                  command=self.fnc_get_g)
         self.btn_m_game.grid(row=0)
 
-        # View Cartogram Button (Row 1 / Row 1)
-        self.btn_m_cartogram = Button(self.frm_m_buttons,
-                                      text="View Cartogram",
-                                      width=15, height=2,
-                                      padx=1, pady=1,
-                                      command=self.fnc_get_c)
-        self.btn_m_cartogram.grid(row=1)
+
 
         # Instructions Button (Row 1 / Row 2)
         self.btn_m_instructions = Button(self.frm_m_buttons,
@@ -76,9 +73,6 @@ class Menu:
     def fnc_get_i(self):
         i = Instructions(self)
         i.lbl_i_text.configure(text="<<< Placeholder >>>")
-
-    def fnc_get_c(self):
-        c = Cartogram(self)
 
     def fnc_get_r(self):
         r = Results(self)
@@ -122,19 +116,27 @@ class Game:
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
         pixel_image = PhotoImage(width=1, height=1)
 
-        # Close Button (Row 2 / Row 0)
+        # View Cartogram Button (Row 2 / Row 0, Column 0)
+        self.btn_g_cartogram = Button(self.frm_g_footer,
+                                      text="View Cartogram",
+                                      width=15, height=2,
+                                      padx=1, pady=1,
+                                      command=self.fnc_get_c)
+        self.btn_g_cartogram.grid(row=0, column=0)
+
+        # Close Button (Row 2 / Row 0, Column 1)
         self.btn_g_close = Button(self.frm_g_footer,
                                  text="Close",
                                  width=10, height=2,
                                  padx=1, pady=1,
                                  command=partial(self.fnc_g_close, menu))
-        self.btn_g_close.grid(row=0)
+        self.btn_g_close.grid(row=0, column=1)
 
         # Generate Cartogram
-        self.fnc_generate_cartogram()
+        self.fnc_generate_cartogram(self)
 
     # Generate Cartogram Function
-    def fnc_generate_cartogram(self):
+    def fnc_generate_cartogram(self, frame):
         # Create State List from .csv file ( [Name, Votes, [Row, Column]]
         import csv
 
@@ -145,8 +147,13 @@ class Game:
             for line in filereader:
                 lst_state_csv.append([line[0], [line[1], line[2]]])
         for i in lst_state_csv:
-            state = State(self, i[0], i[1][0], i[1][1])
+            state = State(frame, i[0], i[1][0], i[1][1])
 
+    # Create Cartogram Window Function
+    def fnc_get_c(self):
+        c = Cartogram(self)
+
+    # Close Window Function
     def fnc_g_close(self, menu):
         # Re-enable Help Button
         menu.btn_m_game.configure(state=NORMAL)
@@ -213,16 +220,16 @@ class Instructions:
 # Cartogram GUI Class
 class Cartogram:
     # Initialize Function
-    def __init__(self, menu):
+    def __init__(self, game):
         # Define Formatting Variables
         bg_colour = "grey"
 
         # Disable Button in Menu
-        menu.btn_m_cartogram.configure(state=DISABLED)
+        game.btn_g_cartogram.configure(state=DISABLED)
 
         # Create Window
         self.box_c = Toplevel()
-        self.box_c.protocol('WM_DELETE_WINDOW', partial(self.fnc_c_close, menu))
+        self.box_c.protocol('WM_DELETE_WINDOW', partial(self.fnc_c_close, game))
 
         # Main Frame
         self.frm_c = Frame(self.box_c, width=100, height=100, bg=bg_colour)
@@ -252,30 +259,16 @@ class Cartogram:
                                  text="Close",
                                  width=10, height=2,
                                  padx=1, pady=1,
-                                 command=partial(self.fnc_c_close, menu))
+                                 command=partial(self.fnc_c_close, game))
         self.btn_c_close.grid(row=0)
 
         # Generate Cartogram
-        self.fnc_generate_cartogram()
-
-    # Generate Cartogram Function
-    def fnc_generate_cartogram(self):
-        # Create State List from .csv file ( [Name, Votes, [Row, Column]]
-        import csv
-
-        # 8 Rows, 11 Columns
-        with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
-            filereader = csv.reader(csvfile, delimiter=',')
-            lst_state_csv = []
-            for line in filereader:
-                lst_state_csv.append([line[0], [line[1], line[2]]])
-        for i in lst_state_csv:
-            state = State(self, i[0], i[1][0], i[1][1])
+        game.fnc_generate_cartogram(self)
 
     # Close Window Function
-    def fnc_c_close(self, menu):
+    def fnc_c_close(self, game):
         # Re-enable Help Button
-        menu.btn_m_cartogram.configure(state=NORMAL)
+        game.btn_g_cartogram.configure(state=NORMAL)
         # Close Window
         self.box_c.destroy()
 
