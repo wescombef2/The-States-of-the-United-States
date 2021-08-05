@@ -1,10 +1,9 @@
 """
 The States of the United States
 Component 03 - Game Cartogram
-Version 1.1 - I have shifted the View Cartogram Button from the Menu Window
-to the Game Window. This way, there will not be two instances of the generate
-state function.
-
+Version 2.0 - Saved all State Objects into a list at the moment of their
+creation, added command to state buttons so that object name is displayed
+on press, not before.
 Finn Wescombe
 05/08/21
 """
@@ -140,6 +139,8 @@ class Game:
         # Create State List from .csv file ( [Name, Votes, [Row, Column]]
         import csv
 
+        # Create Blank List in Which States are Stored
+        self.lst_state_objects = []
         # 8 Rows, 11 Columns
         with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
             filereader = csv.reader(csvfile, delimiter=',')
@@ -148,6 +149,7 @@ class Game:
                 lst_state_csv.append([line[0], [line[1], line[2]]])
         for i in lst_state_csv:
             state = State(frame, i[0], i[1][0], i[1][1])
+            self.lst_state_objects.append(state)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
@@ -337,16 +339,23 @@ class State:
         # Define Format Variables
         bg_colour = "red"
 
+        self.name = name
+
         # State Button
         self.btn_state = Button(frame.frm_cartogram,
-                                text=name,
+                                text="",
                                 highlightbackground="red",
                                 font=("Arial", "8", "bold"),
                                 width=12, height=6,
                                 borderwidth=2,
                                 relief="sunken",
-                                state=NORMAL)
+                                state=NORMAL,
+                                command=self.fnc_display_name)
         self.btn_state.grid(row=row, column=column)
+
+    def fnc_display_name(self):
+        self.btn_state.configure(text=self.name,
+                                 highlightbackground="blue")
 
 
 # Main Routine
