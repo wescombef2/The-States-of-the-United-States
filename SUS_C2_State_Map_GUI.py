@@ -1,8 +1,7 @@
 """
 The States of the United States
 Component 02 - State Map GUI
-Version 3.0 - Created .csv File 'SUS_States.csv' and Changed Generate States
-Function so that it Reads from the File Rather than Using a List
+Version 3.1 - Fixed name issue with first state.
 Finn Wescombe
 03/08/21
 """
@@ -41,12 +40,11 @@ class Cartogram_Test_Window:
         import csv
 
         # 8 Rows, 11 Columns
-        with open('SUS_States.csv', newline='') as csvfile:
+        with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
             filereader = csv.reader(csvfile, delimiter=',')
             lst_state_csv = []
             for line in filereader:
                 lst_state_csv.append([line[0], [line[1], line[2]]])
-
         for i in lst_state_csv:
             state = State(self, i[0], i[1][0], i[1][1])
 
