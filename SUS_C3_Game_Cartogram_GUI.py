@@ -1,9 +1,9 @@
 """
 The States of the United States
 Component 03 - Game Cartogram
-Version 2.0 - Saved all State Objects into a list at the moment of their
-creation, added command to state buttons so that object name is displayed
-on press, not before.
+Version 2.1 – As the View Cartogram Window is Meant to Display the Complete
+and Named Map for Reference, the Generate States Function has been Modified
+so that it is as before without Button Commands in the Cartogram Window.
 Finn Wescombe
 05/08/21
 """
@@ -132,10 +132,10 @@ class Game:
         self.btn_g_close.grid(row=0, column=1)
 
         # Generate Cartogram
-        self.fnc_generate_cartogram(self)
+        self.fnc_generate_cartogram(self, True)
 
     # Generate Cartogram Function
-    def fnc_generate_cartogram(self, frame):
+    def fnc_generate_cartogram(self, frame, game_function):
         # Create State List from .csv file ( [Name, Votes, [Row, Column]]
         import csv
 
@@ -148,7 +148,7 @@ class Game:
             for line in filereader:
                 lst_state_csv.append([line[0], [line[1], line[2]]])
         for i in lst_state_csv:
-            state = State(frame, i[0], i[1][0], i[1][1])
+            state = State(frame, game_function, i[0], i[1][0], i[1][1])
             self.lst_state_objects.append(state)
 
     # Create Cartogram Window Function
@@ -265,7 +265,7 @@ class Cartogram:
         self.btn_c_close.grid(row=0)
 
         # Generate Cartogram
-        game.fnc_generate_cartogram(self)
+        game.fnc_generate_cartogram(self, False)
 
     # Close Window Function
     def fnc_c_close(self, game):
@@ -334,7 +334,7 @@ class Results:
 # State Class
 class State:
 
-    def __init__(self, frame, name, row, column):
+    def __init__(self, frame, game_function, name, row, column):
 
         # Define Format Variables
         bg_colour = "red"
@@ -343,14 +343,17 @@ class State:
 
         # State Button
         self.btn_state = Button(frame.frm_cartogram,
-                                text="",
+                                text=self.name,
                                 highlightbackground="red",
                                 font=("Arial", "8", "bold"),
                                 width=12, height=6,
                                 borderwidth=2,
                                 relief="sunken",
-                                state=NORMAL,
-                                command=self.fnc_display_name)
+                                state=NORMAL)
+        # Add Game Functionality If Needed
+        if game_function:
+            self.btn_state.configure(text="", command=self.fnc_display_name)
+
         self.btn_state.grid(row=row, column=column)
 
     def fnc_display_name(self):
