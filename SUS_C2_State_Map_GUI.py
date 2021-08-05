@@ -1,8 +1,8 @@
 """
 The States of the United States
 Component 02 - State Map GUI
-Version 2.0 - Formed Function that Creates Multiple State Objects Using Row/Column
-Indexes.
+Version 3.0 - Created .csv File 'SUS_States.csv' and Changed Generate States
+Function so that it Reads from the File Rather than Using a List
 Finn Wescombe
 03/08/21
 """
@@ -32,16 +32,23 @@ class Cartogram_Test_Window:
         self.frm_c_footer = Frame(self.frm_c, width=100, height=20, bg=bg_colour)
         self.frm_c_footer.grid(row=2)
 
-        # Create State List
-        states = [["A", [1, 1]], ["B", [1, 2]], ["C", [1, 3]],
-                  ["D", [2, 1]], ["E", [2, 2]], ["F", [2, 3]],
-                  ["G", [3, 1]], ["H", [3, 2]], ["I", [3, 3]]]
-        self.fnc_generate_states(states)
+        # Call Generate States Function
+        self.fnc_generate_states()
 
     # Generate States Test Function
-    def fnc_generate_states(self, list):
-        for i in list:
-            test_state = State(self, i[0], i[1][0], i[1][1])
+    def fnc_generate_states(self):
+        # Create State List from .csv file ( [Name, Votes, [Row, Column]]
+        import csv
+
+        # 8 Rows, 11 Columns
+        with open('SUS_States.csv', newline='') as csvfile:
+            filereader = csv.reader(csvfile, delimiter=',')
+            lst_state_csv = []
+            for line in filereader:
+                lst_state_csv.append([line[0], [line[1], line[2]]])
+
+        for i in lst_state_csv:
+            state = State(self, i[0], i[1][0], i[1][1])
 
 # State Class
 class State:
