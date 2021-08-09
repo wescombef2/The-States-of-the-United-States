@@ -1,16 +1,17 @@
 """
 The States of the United States
 Component 04 - Question Generation
-Version 1.0 – Method 1: Created a Function that Generates Questions from a
-.csv file, Triggered by a Button.
+Version 1.1 - An unformatted label has been added during the initial game window initialisation,
+with the generate question function now configuring it. '-1' added to length for ranges of random
+index generation.
 Finn Wescombe
 05/08/21
 """
 
 # Import Tools
-from tkinter import * # For GUI Display
-from functools import partial # To Prevent Unwanted Windows
-import csv # For External States File and Saves File
+from tkinter import *  # For GUI Display
+from functools import partial  # To Prevent Unwanted Windows
+import csv  # For External States File and Saves File
 
 
 # Menu GUI Class
@@ -46,8 +47,6 @@ class Menu:
                                  padx=1, pady=1,
                                  command=self.fnc_get_g)
         self.btn_m_game.grid(row=0)
-
-
 
         # Instructions Button (Row 1 / Row 2)
         self.btn_m_instructions = Button(self.frm_m_buttons,
@@ -111,6 +110,15 @@ class Game:
         self.frm_questions = Frame(self.frm_game, width=100, height=20, bg=bg_colour)
         self.frm_questions.grid(row=0)
 
+        # Basic Question Label
+        self.lbl_g_question = Label(self.frm_questions,
+                                    # Format Random Name from State List into Generic Statement
+                                    text="",
+                                    font=("Arial", "12", "bold"),
+                                    bg=bg_colour,
+                                    padx=10, pady=5)
+        self.lbl_g_question.grid(row=1)
+
         # Cartogram Frame (Row 1 / Row 1)
         self.frm_cartogram = Frame(self.frm_game, width=100, height=100, bg=bg_colour)
         self.frm_cartogram.grid(row=1)
@@ -132,18 +140,18 @@ class Game:
 
         # Generate Question Button (Row 1 / Row 0 / Row 0)
         self.btn_g_generate_q = Button(self.frm_questions,
-                                      text="Generate Question",
-                                      width=15, height=2,
-                                      padx=1, pady=1,
-                                      command=self.fnc_generate_question)
+                                       text="Generate Question",
+                                       width=15, height=2,
+                                       padx=1, pady=1,
+                                       command=self.fnc_generate_question)
         self.btn_g_generate_q.grid(row=0, column=0)
 
         # Close Button (Row 2 / Row 0, Column 1)
         self.btn_g_close = Button(self.frm_g_footer,
-                                 text="Close",
-                                 width=10, height=2,
-                                 padx=1, pady=1,
-                                 command=partial(self.fnc_g_close, menu))
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_g_close, menu))
         self.btn_g_close.grid(row=0, column=1)
 
         # Generate Cartogram
@@ -180,14 +188,10 @@ class Game:
                 self.lst_state_names.append(line[0])
 
         # Create Question Label (Row 1 / Row 0 / Row 1)
-        bg_colour="grey"
-        lbl_g_question = Label(self.frm_questions,
-                               # Format Random Name from State List into Generic Statement
-                               text="Which State is {}?".format(self.lst_state_names[random.randint(0,len(self.lst_state_names)-1)],
-                               font=("Arial", "12", "bold"),
-                               bg=bg_colour,
-                               padx=10, pady=5))
-        lbl_g_question.grid(row=1)
+        bg_colour = "grey"
+
+        self.lbl_g_question.configure(
+            text="Which State is {}?".format(self.lst_state_names[random.randint(0, len(self.lst_state_names) - 1)]))
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
@@ -229,10 +233,10 @@ class Instructions:
 
         # Instruction Text (Row 1)
         self.lbl_i_text = Label(self.frm_i,
-                                   text="",
-                                   font=("Arial", "12"),
-                                   bg=bg_colour,
-                                   padx=10, pady=10)
+                                text="",
+                                font=("Arial", "12"),
+                                bg=bg_colour,
+                                padx=10, pady=10)
         self.lbl_i_text.grid(row=1)
 
         # Footer Frame (Row 2)
@@ -244,10 +248,10 @@ class Instructions:
 
         # Close Button (Row 2 / Row 0)
         self.btn_i_close = Button(self.frm_i_footer,
-                                 text="Close",
-                                 width=10, height=2,
-                                 padx=1, pady=1,
-                                 command=partial(self.fnc_i_close, menu))
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_i_close, menu))
         self.btn_i_close.grid(row=0)
 
     def fnc_i_close(self, menu):
@@ -296,10 +300,10 @@ class Cartogram:
 
         # Close Button (Row 2 / Row 0)
         self.btn_c_close = Button(self.frm_c_footer,
-                                 text="Close",
-                                 width=10, height=2,
-                                 padx=1, pady=1,
-                                 command=partial(self.fnc_c_close, game))
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_c_close, game))
         self.btn_c_close.grid(row=0)
 
         # Generate Cartogram
@@ -341,10 +345,10 @@ class Results:
 
         # Results Text (Row 1)
         self.lbl_r_text = Label(self.frm_r,
-                                   text="",
-                                   font=("Arial", "12"),
-                                   bg=bg_colour,
-                                   padx=10, pady=10)
+                                text="",
+                                font=("Arial", "12"),
+                                bg=bg_colour,
+                                padx=10, pady=10)
         self.lbl_r_text.grid(row=1)
 
         # Footer Frame (Row 2)
@@ -356,10 +360,10 @@ class Results:
 
         # Close Button (Row 2 / Row 0)
         self.btn_r_close = Button(self.frm_r_footer,
-                                 text="Close",
-                                 width=10, height=2,
-                                 padx=1, pady=1,
-                                 command=partial(self.fnc_r_close, menu))
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_r_close, menu))
         self.btn_r_close.grid(row=0)
 
     def fnc_r_close(self, menu):
@@ -373,7 +377,6 @@ class Results:
 class State:
 
     def __init__(self, frame, game_function, name, row, column):
-
         # Define Format Variables
         bg_colour = "red"
 
