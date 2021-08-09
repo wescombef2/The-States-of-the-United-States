@@ -1,12 +1,10 @@
 """
 The States of the United States
-Component 04 - Question Generation
-Version 1.0 - Replaced Display Name Function in State Objects with Send Response Function that checks if its name
-matches the name of the state currently selected; if not, it displays as red with name, if so, it displays as green
-with name with 'Correct' in question label. Nothing occurs if no question is current (including if the question has
-been answered). Every new question clears all formatted states.
+Component 05 - Response Evaluation
+Version 1.1 – Fixed bug where the question label remains green after a correct answer. Changed standard background
+from grey to white along with larger font to make it clearer to the user.
 Finn Wescombe
-05/08/21
+10/08/21
 """
 
 
@@ -117,7 +115,7 @@ class Game:
         self.lbl_g_question = Label(self.frm_questions,
                                     # Format Random Name from State List into Generic Statement
                                     text="",
-                                    font=("Arial", "12", "bold"),
+                                    font=("Arial", "16", "bold"),
                                     bg=bg_colour,
                                     padx=10, pady=5)
         self.lbl_g_question.grid(row=1)
@@ -189,7 +187,7 @@ class Game:
         self.var_current_question = True
         # Create Question Label (Row 1 / Row 0 / Row 1)
         self.obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
-        self.lbl_g_question.configure(text="Which State is {}?".format(self.obj_selected_state.name))
+        self.lbl_g_question.configure(text="Which State is {}?".format(self.obj_selected_state.name), bg="white")
         # Add Newly Selected State to Selected List
         self.lst_selected_states.append(self.obj_selected_state)
         # Increase Current Selection Index
