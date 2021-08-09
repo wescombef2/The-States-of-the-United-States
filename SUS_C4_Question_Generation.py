@@ -1,22 +1,24 @@
 """
 The States of the United States
 Component 04 - Question Generation
-Version 2.0 – Method 2: Changed the function so that instead of reading the .csv file to form a list
-it gets the name from the State objects in the state list.
+Version 3.0 - Created list in which selected state objects are stored so that the current selection can
+be blue and all others including previous red.
 Finn Wescombe
 05/08/21
 """
 
+
+
 # Import Tools
 from tkinter import *  # For GUI Display
 from functools import partial  # To Prevent Unwanted Windows
-import csv  # For External States File and Saves File
-
 
 # Menu GUI Class
 class Menu:
+
     # Initialize Function
     def __init__(self):
+
         # Define Formatting Variables
         bg_colour = "grey"
 
@@ -118,6 +120,10 @@ class Game:
                                     padx=10, pady=5)
         self.lbl_g_question.grid(row=1)
 
+        # Create List for Storing Selected State Objects
+        self.lst_selected_states = [""] # Placeholder Item so that 0 is not an Index.
+        self.var_selection_index = 0
+
         # Cartogram Frame (Row 1 / Row 1)
         self.frm_cartogram = Frame(self.frm_game, width=100, height=100, bg=bg_colour)
         self.frm_cartogram.grid(row=1)
@@ -177,9 +183,18 @@ class Game:
         import random
 
         # Create Question Label (Row 1 / Row 0 / Row 1)
-        obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
-        self.lbl_g_question.configure(
-            text="Which State is {}?".format(obj_selected_state.name))
+        self.obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
+        self.lbl_g_question.configure(text="Which State is {}?".format(self.obj_selected_state.name))
+        # Add Newly Selected State to Selected List
+        self.lst_selected_states.append(self.obj_selected_state)
+        # Increase Current Selection Index
+        self.var_selection_index += 1
+        # Return Previously Selected State (using si-1) to Red (with if statement to ignore placeholder)
+        if self.lst_selected_states[self.var_selection_index-1]:
+            self.lst_selected_states[self.var_selection_index-1].btn_state.configure(highlightbackground="red")
+        # Highlight Currently Selected State as Blue
+        self.lst_selected_states[self.var_selection_index].btn_state.configure(highlightbackground="blue")
+
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
