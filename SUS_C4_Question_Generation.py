@@ -1,9 +1,8 @@
 """
 The States of the United States
 Component 04 - Question Generation
-Version 1.1 - An unformatted label has been added during the initial game window initialisation,
-with the generate question function now configuring it. '-1' added to length for ranges of random
-index generation.
+Version 2.0 – Method 2: Changed the function so that instead of reading the .csv file to form a list
+it gets the name from the State objects in the state list.
 Finn Wescombe
 05/08/21
 """
@@ -159,7 +158,7 @@ class Game:
 
     # Generate Cartogram Function
     def fnc_generate_cartogram(self, frame, game_function):
-        # Create State List from .csv file ( [Name, Votes, [Row, Column]]
+        # Create State List from .csv file ( [Name, [Row, Column]]
         import csv
 
         # Create Blank List in Which States are Stored
@@ -175,23 +174,12 @@ class Game:
             self.lst_state_objects.append(state)
 
     def fnc_generate_question(self):
-        # Create State List from .csv file ( [Name, Votes, [Row, Column]]
-        import csv
         import random
 
-        with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
-            filereader = csv.reader(csvfile, delimiter=',')
-            # Create Blank List for State Names
-            self.lst_state_names = []
-            for line in filereader:
-                # Store Names in List
-                self.lst_state_names.append(line[0])
-
         # Create Question Label (Row 1 / Row 0 / Row 1)
-        bg_colour = "grey"
-
+        obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
         self.lbl_g_question.configure(
-            text="Which State is {}?".format(self.lst_state_names[random.randint(0, len(self.lst_state_names) - 1)]))
+            text="Which State is {}?".format(obj_selected_state.name))
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
