@@ -1,9 +1,8 @@
 """
 The States of the United States
 Component 04 - Question Generation
-Version 2.1 – As the View Cartogram Window is Meant to Display the Complete
-and Named Map for Reference, the Generate States Function has been Modified
-so that it is as before without Button Commands in the Cartogram Window.
+Version 1.0 – Method 1: Created a Function that Generates Questions from a
+.csv file, Triggered by a Button.
 Finn Wescombe
 05/08/21
 """
@@ -104,8 +103,16 @@ class Game:
                                    padx=10, pady=5)
         self.lbl_g_heading.grid(row=0)
 
-        # Cartogram Frame (Row 1)
-        self.frm_cartogram = Frame(self.frm_g, width=100, height=100, bg=bg_colour)
+        # Game Cartogram and Questions Frame (Row 1)
+        self.frm_game = Frame(self.frm_g, width=100, height=100, bg=bg_colour)
+        self.frm_game.grid(row=1)
+
+        # Questions Frame (Row 1 / Row 0)
+        self.frm_questions = Frame(self.frm_game, width=100, height=20, bg=bg_colour)
+        self.frm_questions.grid(row=0)
+
+        # Cartogram Frame (Row 1 / Row 1)
+        self.frm_cartogram = Frame(self.frm_game, width=100, height=100, bg=bg_colour)
         self.frm_cartogram.grid(row=1)
 
         # Footer Frame (Row 2)
@@ -122,6 +129,14 @@ class Game:
                                       padx=1, pady=1,
                                       command=self.fnc_get_c)
         self.btn_g_cartogram.grid(row=0, column=0)
+
+        # Generate Question Button (Row 1 / Row 0 / Row 0)
+        self.btn_g_generate_q = Button(self.frm_questions,
+                                      text="Generate Question",
+                                      width=15, height=2,
+                                      padx=1, pady=1,
+                                      command=self.fnc_generate_question)
+        self.btn_g_generate_q.grid(row=0, column=0)
 
         # Close Button (Row 2 / Row 0, Column 1)
         self.btn_g_close = Button(self.frm_g_footer,
@@ -150,6 +165,29 @@ class Game:
         for i in lst_state_csv:
             state = State(frame, game_function, i[0], i[1][0], i[1][1])
             self.lst_state_objects.append(state)
+
+    def fnc_generate_question(self):
+        # Create State List from .csv file ( [Name, Votes, [Row, Column]]
+        import csv
+        import random
+
+        with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
+            filereader = csv.reader(csvfile, delimiter=',')
+            # Create Blank List for State Names
+            self.lst_state_names = []
+            for line in filereader:
+                # Store Names in List
+                self.lst_state_names.append(line[0])
+
+        # Create Question Label (Row 1 / Row 0 / Row 1)
+        bg_colour="grey"
+        lbl_g_question = Label(self.frm_questions,
+                               # Format Random Name from State List into Generic Statement
+                               text="Which State is {}?".format(self.lst_state_names[random.randint(0,len(self.lst_state_names)-1)],
+                               font=("Arial", "12", "bold"),
+                               bg=bg_colour,
+                               padx=10, pady=5))
+        lbl_g_question.grid(row=1)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
