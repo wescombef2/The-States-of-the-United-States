@@ -1,9 +1,8 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 1.0 – Made question generation automatic (removed generation button) with pause Before generating the next.
-Finn Wescombe
-10/08/21
+Version 1.1 - Removed loop for questions and had new question generate in the State Class send Response function.
+12/08/21
 """
 
 
@@ -162,10 +161,7 @@ class Game:
         self.var_current_question = False
 
         # Generate Question
-        for i in range(0,5):
-            while self.var_current_question:
-                pass
-            self.fnc_generate_question()
+        self.fnc_generate_question()
 
 
     # Generate Cartogram Function
@@ -417,8 +413,10 @@ class State:
             if self.obj_game.obj_selected_state.name == self.name:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="green")
-                self.obj_game.var_current_question = False
                 self.obj_game.lbl_g_question.configure(text="Correct", bg="green")
+                # Generate New Question
+                self.obj_game.var_current_question = False
+                self.obj_game.fnc_generate_question()
             else:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="red")
