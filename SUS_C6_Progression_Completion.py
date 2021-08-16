@@ -1,7 +1,8 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 1.2 – Added Time Gap before a new question is generated.
+Version 1.3 – Created and implemented internal results frame with button for generating new question,
+that will display once answered.
 12/08/21
 """
 
@@ -9,12 +10,12 @@ Version 1.2 – Added Time Gap before a new question is generated.
 from tkinter import *  # For GUI Display
 from functools import partial  # To Prevent Unwanted Windows
 
+
 # Menu GUI Class
 class Menu:
 
     # Initialize Function
     def __init__(self):
-
         # Define Formatting Variables
         bg_colour = "grey"
 
@@ -100,15 +101,15 @@ class Game:
         self.lbl_g_heading.grid(row=0)
 
         # Game Cartogram and Questions Frame (Row 1)
-        self.frm_game = Frame(self.frm_g, width=100, height=100, bg=bg_colour)
-        self.frm_game.grid(row=1)
+        self.frm_g_game = Frame(self.frm_g, width=100, height=100, bg=bg_colour)
+        self.frm_g_game.grid(row=1)
 
         # Questions Frame (Row 1 / Row 0)
-        self.frm_questions = Frame(self.frm_game, width=100, height=20, bg=bg_colour)
-        self.frm_questions.grid(row=0)
+        self.frm_g_internal = Frame(self.frm_g_game, width=100, height=20, bg=bg_colour)
+        self.frm_g_internal.grid(row=0)
 
         # Basic Question Label
-        self.lbl_g_question = Label(self.frm_questions,
+        self.lbl_g_question = Label(self.frm_g_internal,
                                     # Format Random Name from State List into Generic Statement
                                     text="",
                                     font=("Arial", "16", "bold"),
@@ -117,7 +118,7 @@ class Game:
         self.lbl_g_question.grid(row=1)
 
         # Cartogram Frame (Row 1 / Row 1)
-        self.frm_cartogram = Frame(self.frm_game, width=100, height=100, bg=bg_colour)
+        self.frm_cartogram = Frame(self.frm_g_game, width=100, height=100, bg=bg_colour)
         self.frm_cartogram.grid(row=1)
 
         # Footer Frame (Row 2)
@@ -149,18 +150,15 @@ class Game:
         # Commence Game Routine
         self.fnc_game_intialise()
 
-
-
     # Game Routine Function
     def fnc_game_intialise(self):
         # Create List for Storing Selected State Objects along with other Variables
-        self.lst_selected_states = [""] # Placeholder Item so that 0 is not an Index.
+        self.lst_selected_states = [""]  # Placeholder Item so that 0 is not an Index.
         self.var_selection_index = 0
         self.var_current_question = False
 
         # Generate Question
-        self.fnc_generate_question()
-
+        self.fnc_internal_results("We're in Position Now, Sir", "white")
 
     # Generate Cartogram Function
     def fnc_generate_cartogram(self, frame, game_function):
@@ -183,6 +181,9 @@ class Game:
     def fnc_generate_question(self):
         import random
 
+        # Destroy Generate Question Button
+        self.btn_g_question.destroy()
+
         # Boolean Variable for Current Question
         self.var_current_question = True
         # Create Question Label (Row 1 / Row 0 / Row 1)
@@ -198,6 +199,20 @@ class Game:
             obj.btn_state.configure(text="", highlightbackground="white")
         # Highlight Currently Selected State as Blue
         self.lst_selected_states[self.var_selection_index].btn_state.configure(text="", highlightbackground="blue")
+
+    # Create Internal Results Function
+    def fnc_internal_results(self, result_text, lbl_colour):
+        # Create Internal Results GUI
+        # Configure Question Label
+        self.lbl_g_question.configure(text=result_text, bg=lbl_colour)
+
+        # Generate Question Button (Row 2)
+        self.btn_g_question = Button(self.frm_g_internal,
+                                     text="New Question",
+                                     width=10, height=2,
+                                     padx=1, pady=1,
+                                     command=self.fnc_generate_question)
+        self.btn_g_question.grid(row=2)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
@@ -412,23 +427,14 @@ class State:
             if self.obj_game.obj_selected_state.name == self.name:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="green")
-                self.obj_game.lbl_g_question.configure(text="Correct", bg="green")
-
                 self.obj_game.var_current_question = False
-
+                # Generate Internal Results
+                self.obj_game.fnc_internal_results("| Correct |", "green")
             else:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="red")
-        # Check if Question is Answered
-        import asyncio
-        async def delay():
-            if not self.obj_game.var_current_question:
-                print("Delaying...", flush=True)
-                await asyncio.sleep(3)
-        asyncio.run(delay())
 
-        # Generate Question
-        self.obj_game.fnc_generate_question()
+
 
 # Main Routine
 
