@@ -1,11 +1,9 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 1.1 - Removed loop for questions and had new question generate in the State Class send Response function.
+Version 1.2 – Added Time Gap before a new question is generated.
 12/08/21
 """
-
-
 
 # Import Tools
 from tkinter import *  # For GUI Display
@@ -194,6 +192,7 @@ class Game:
         self.lst_selected_states.append(self.obj_selected_state)
         # Increase Current Selection Index
         self.var_selection_index += 1
+
         # Return All States to White and no Name
         for obj in self.lst_state_objects:
             obj.btn_state.configure(text="", highlightbackground="white")
@@ -414,16 +413,25 @@ class State:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="green")
                 self.obj_game.lbl_g_question.configure(text="Correct", bg="green")
-                # Generate New Question
+
                 self.obj_game.var_current_question = False
-                self.obj_game.fnc_generate_question()
+
             else:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="red")
+        # Check if Question is Answered
+        import asyncio
+        async def delay():
+            if not self.obj_game.var_current_question:
+                print("Delaying...", flush=True)
+                await asyncio.sleep(3)
+        asyncio.run(delay())
 
-
+        # Generate Question
+        self.obj_game.fnc_generate_question()
 
 # Main Routine
+
 if __name__ == "__main__":
     root = Tk()
     root.title("The States of the United States")
