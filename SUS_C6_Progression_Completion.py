@@ -1,8 +1,7 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 2.0 – Removed blue correct state hint highlight. Added system so that after three incorrect guesses
-the question also ends.
+Version 3.0 – Method 1: Added entry box for number of questions in menu.
 12/08/21
 """
 
@@ -32,22 +31,29 @@ class Menu:
         self.lbl_m_heading.grid(row=0)
 
         # Button Frame (Row 1)
-        self.frm_m_buttons = Frame(self.frm_m, width=100, height=100, bg=bg_colour)
-        self.frm_m_buttons.grid(row=1)
+        self.frm_m_widgets = Frame(self.frm_m, width=100, height=100, bg=bg_colour)
+        self.frm_m_widgets.grid(row=1)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
         pixel_image = PhotoImage(width=1, height=1)
 
         # Play Game Button (Row 1 / Row 0)
-        self.btn_m_game = Button(self.frm_m_buttons,
+        self.btn_m_game = Button(self.frm_m_widgets,
                                  text="Play",
                                  width=15, height=2,
                                  padx=1, pady=1,
                                  command=self.fnc_get_g)
         self.btn_m_game.grid(row=0)
 
+        # Entry Box (Row 1 / Row 1)
+        self.ent_m_questions = Entry(self.frm_m_widgets,
+                                     width=15,
+                                     font=("Arial", "14", "bold"),
+                                     justify=CENTER)
+        self.ent_m_questions.grid(row=1)
+
         # Instructions Button (Row 1 / Row 2)
-        self.btn_m_instructions = Button(self.frm_m_buttons,
+        self.btn_m_instructions = Button(self.frm_m_widgets,
                                          text="Instructions",
                                          width=15, height=2,
                                          padx=1, pady=1,
@@ -55,7 +61,7 @@ class Menu:
         self.btn_m_instructions.grid(row=2)
 
         # View Past Results Button (Row 1 / Row 3)
-        self.btn_m_results = Button(self.frm_m_buttons,
+        self.btn_m_results = Button(self.frm_m_widgets,
                                     text="View Past Results",
                                     width=15, height=2,
                                     padx=1, pady=1,
@@ -63,7 +69,12 @@ class Menu:
         self.btn_m_results.grid(row=3)
 
     def fnc_get_g(self):
-        g = Game(self)
+        try:
+            q_count = int(self.ent_m_questions.get())
+            g = Game(self, q_count)
+        except ValueError:
+            print("Value Error")
+
 
     def fnc_get_i(self):
         i = Instructions(self)
@@ -77,9 +88,10 @@ class Menu:
 # Game GUI Class
 class Game:
     # Initialize Function
-    def __init__(self, menu):
+    def __init__(self, menu, q_count):
         # Define Formatting Variables
         bg_colour = "grey"
+        self.q_count = q_count
 
         # Disable Button in Menu
         menu.btn_m_game.configure(state=DISABLED)
@@ -158,7 +170,7 @@ class Game:
         self.var_current_question = False
 
         # Generate Question
-        self.fnc_internal_results("We're in Position Now, Sir", "white")
+        self.fnc_internal_results("Loaded", "white")
 
     # Generate Cartogram Function
     def fnc_generate_cartogram(self, frame, game_function):
@@ -203,17 +215,21 @@ class Game:
 
     # Create Internal Results Function
     def fnc_internal_results(self, result_text, lbl_colour):
+        self.q_count -= 1
+        # Check if Game is Over
         # Create Internal Results GUI
         # Configure Question Label
         self.lbl_g_question.configure(text=result_text, bg=lbl_colour)
 
         # Generate Question Button (Row 2)
         self.btn_g_question = Button(self.frm_g_internal,
-                                     text="New Question",
-                                     width=10, height=2,
-                                     padx=1, pady=1,
-                                     command=self.fnc_generate_question)
+                                        text="New Question",
+                                         width=10, height=2,
+                                         padx=1, pady=1,
+                                         command=self.fnc_generate_question)
         self.btn_g_question.grid(row=2)
+        if self.q_count < 0:
+            self.btn_g_question.configure(text="Quit", command=self.fnc_g_close, highlightbackground="green")
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
@@ -439,7 +455,6 @@ class State:
                 if self.obj_game.var_current_attempts >= 3:
                     self.obj_game.fnc_internal_results("Incorrect", "red")
                     self.obj_game.var_current_question = False
-
 
 
 # Main Routine
