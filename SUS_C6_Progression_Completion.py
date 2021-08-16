@@ -1,8 +1,8 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 1.3 – Created and implemented internal results frame with button for generating new question,
-that will display once answered.
+Version 2.0 – Removed blue correct state hint highlight. Added system so that after three incorrect guesses
+the question also ends.
 12/08/21
 """
 
@@ -186,6 +186,9 @@ class Game:
 
         # Boolean Variable for Current Question
         self.var_current_question = True
+        # Counting Variable to Record Attempts
+        self.var_current_attempts = 0
+
         # Create Question Label (Row 1 / Row 0 / Row 1)
         self.obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
         self.lbl_g_question.configure(text="Which State is {}?".format(self.obj_selected_state.name), bg="white")
@@ -194,11 +197,9 @@ class Game:
         # Increase Current Selection Index
         self.var_selection_index += 1
 
-        # Return All States to White and no Name
+        # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text="", highlightbackground="white")
-        # Highlight Currently Selected State as Blue
-        self.lst_selected_states[self.var_selection_index].btn_state.configure(text="", highlightbackground="blue")
+            obj.btn_state.configure(text="", highlightbackground="white", state=NORMAL)
 
     # Create Internal Results Function
     def fnc_internal_results(self, result_text, lbl_colour):
@@ -429,10 +430,15 @@ class State:
                                          highlightbackground="green")
                 self.obj_game.var_current_question = False
                 # Generate Internal Results
-                self.obj_game.fnc_internal_results("| Correct |", "green")
+                self.obj_game.fnc_internal_results("Correct", "green")
             else:
                 self.btn_state.configure(text=self.name,
-                                         highlightbackground="red")
+                                         highlightbackground="red",
+                                         state=DISABLED)
+                self.obj_game.var_current_attempts += 1
+                if self.obj_game.var_current_attempts >= 3:
+                    self.obj_game.fnc_internal_results("Incorrect", "red")
+                    self.obj_game.var_current_question = False
 
 
 
