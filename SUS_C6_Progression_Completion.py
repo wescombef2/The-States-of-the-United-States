@@ -1,7 +1,7 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 3.0 – Method 1: Added entry box for number of questions in menu.
+Version 3.1 – Fixed Quit Bug
 12/08/21
 """
 
@@ -92,6 +92,7 @@ class Game:
         # Define Formatting Variables
         bg_colour = "grey"
         self.q_count = q_count
+        self.menu = menu
 
         # Disable Button in Menu
         menu.btn_m_game.configure(state=DISABLED)
@@ -229,7 +230,7 @@ class Game:
                                          command=self.fnc_generate_question)
         self.btn_g_question.grid(row=2)
         if self.q_count < 0:
-            self.btn_g_question.configure(text="Quit", command=self.fnc_g_close, highlightbackground="green")
+            self.btn_g_question.configure(text="Quit", command=partial(self.fnc_g_close, self.menu), highlightbackground="green")
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
