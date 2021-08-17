@@ -1,12 +1,13 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 3.1 – Fixed Quit Bug
+Version 3.2 – Method 2: Added lookup field in menu for number of questions.
 12/08/21
 """
 
 # Import Tools
 from tkinter import *  # For GUI Display
+from tkinter import ttk # For Combobox
 from functools import partial  # To Prevent Unwanted Windows
 
 
@@ -45,11 +46,11 @@ class Menu:
                                  command=self.fnc_get_g)
         self.btn_m_game.grid(row=0)
 
-        # Entry Box (Row 1 / Row 1)
-        self.ent_m_questions = Entry(self.frm_m_widgets,
-                                     width=15,
-                                     font=("Arial", "14", "bold"),
-                                     justify=CENTER)
+        # Combo Box (Row 1 / Row 1)
+        self.lst_quiz_options = ["3 (Trial)", "10 (Short)", "20 (Long)", "51 (Complete)"]
+        self.ent_m_questions = ttk.Combobox(self.frm_m_widgets)
+        self.ent_m_questions['values'] = self.lst_quiz_options
+        self.ent_m_questions['state'] = 'readonly'  # normal
         self.ent_m_questions.grid(row=1)
 
         # Instructions Button (Row 1 / Row 2)
@@ -70,7 +71,7 @@ class Menu:
 
     def fnc_get_g(self):
         try:
-            q_count = int(self.ent_m_questions.get())
+            q_count = self.ent_m_questions.get()
             g = Game(self, q_count)
         except ValueError:
             print("Value Error")
@@ -88,10 +89,11 @@ class Menu:
 # Game GUI Class
 class Game:
     # Initialize Function
-    def __init__(self, menu, q_count):
+    def __init__(self, menu, q_opt):
         # Define Formatting Variables
         bg_colour = "grey"
-        self.q_count = q_count
+        q_opt_split = q_opt.split(" ")
+        self.q_count = int(q_opt_split[0])
         self.menu = menu
 
         # Disable Button in Menu
