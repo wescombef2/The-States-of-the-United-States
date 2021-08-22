@@ -1,7 +1,8 @@
 """
 The States of the United States
 Component 06 - Progression and Completion
-Version 3.2 – Method 2: Added lookup field in menu for number of questions.
+Version 3.2 – Method 2: Added lookup field in menu for number of questions. Fixed
+error with generating reference cartogram overriding the state object list.
 12/08/21
 """
 
@@ -87,6 +88,7 @@ class Menu:
 
 
 # Game GUI Class
+# noinspection PyAttributeOutsideInit
 class Game:
     # Initialize Function
     def __init__(self, menu, q_opt):
@@ -180,8 +182,9 @@ class Game:
         # Create State List from .csv file ( [Name, [Row, Column]]
         import csv
 
-        # Create Blank List in Which States are Stored
-        self.lst_state_objects = []
+        # Create Blank List in Which States are Stored (Only if for new game)
+        if game_function:
+            self.lst_state_objects = []
         # 8 Rows, 11 Columns
         with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile:
             filereader = csv.reader(csvfile, delimiter=',')
@@ -190,7 +193,8 @@ class Game:
                 lst_state_csv.append([line[0], [line[1], line[2]]])
         for i in lst_state_csv:
             state = State(frame, game_function, i[0], i[1][0], i[1][1])
-            self.lst_state_objects.append(state)
+            if game_function:
+                self.lst_state_objects.append(state)
 
     # Generate Question Function
     def fnc_generate_question(self):
