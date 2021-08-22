@@ -1,8 +1,7 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 1.0 - Saved Results in a list, refreshing each game, and displayed current
-tally in internal results.
+Version 2.0 - On completion, write results tally to an external .csv file.
 12/08/21
 """
 
@@ -237,6 +236,15 @@ class Game:
         self.btn_g_question.grid(row=2)
         if self.q_count < 0:
             self.btn_g_question.configure(text="Quit", command=partial(self.fnc_g_close, self.menu), highlightbackground="green")
+            
+            # Write to a csv file
+            import csv
+            # open the file in the write mode
+            with open('SUS_Saved_Results.csv', 'w') as f:
+                # create the csv writer
+                writer = csv.writer(f)
+                # write tally to the csv file
+                writer.writerow(self.lst_tally)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
