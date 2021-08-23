@@ -1,7 +1,7 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 2.0 - On completion, write results tally to an external .csv file.
+Version 2.1 - Fixed issue with new rows overwriting old, Fixed csv encoding issue.
 12/08/21
 """
 
@@ -236,15 +236,19 @@ class Game:
         self.btn_g_question.grid(row=2)
         if self.q_count < 0:
             self.btn_g_question.configure(text="Quit", command=partial(self.fnc_g_close, self.menu), highlightbackground="green")
-            
+
             # Write to a csv file
-            import csv
+            from csv import writer
             # open the file in the write mode
-            with open('SUS_Saved_Results.csv', 'w') as f:
+            with open('SUS_Saved_Results.csv', 'a', newline='', encoding='utf-8-sig') as f_object:
                 # create the csv writer
-                writer = csv.writer(f)
-                # write tally to the csv file
-                writer.writerow(self.lst_tally)
+                writer_object = writer(f_object)
+
+                # Pass the list as an argument into
+                # the writerow()
+                writer_object.writerow(self.lst_tally)
+                # Close the file object
+                f_object.close()
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
