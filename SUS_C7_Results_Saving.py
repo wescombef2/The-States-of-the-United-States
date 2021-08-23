@@ -1,13 +1,15 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 2.1 - Fixed issue with new rows overwriting old, Fixed csv encoding issue.
+Version 3.0 - Created External Results Class that is called from internal results,
+shifted results saving functionality to button in this class, that gets username
+from an entry box and appends that to csv file alongside tally.
 12/08/21
 """
 
 # Import Tools
 from tkinter import *  # For GUI Display
-from tkinter import ttk # For Combobox
+from tkinter import ttk  # For Combobox
 from functools import partial  # To Prevent Unwanted Windows
 
 
@@ -32,7 +34,8 @@ class Menu:
         self.lbl_m_heading.grid(row=0)
 
         # Button Frame (Row 1)
-        self.frm_m_widgets = Frame(self.frm_m, width=100, height=100, bg=bg_colour)
+        self.frm_m_widgets = Frame(self.frm_m, width=100, height=100,
+                                   bg=bg_colour)
         self.frm_m_widgets.grid(row=1)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
@@ -47,7 +50,8 @@ class Menu:
         self.btn_m_game.grid(row=0)
 
         # Combo Box (Row 1 / Row 1)
-        self.lst_quiz_options = ["3 (Trial)", "10 (Short)", "20 (Long)", "51 (Complete)"]
+        self.lst_quiz_options = ["3 (Trial)", "10 (Short)", "20 (Long)",
+                                 "51 (Complete)"]
         self.ent_m_questions = ttk.Combobox(self.frm_m_widgets)
         self.ent_m_questions['values'] = self.lst_quiz_options
         self.ent_m_questions['state'] = 'readonly'  # normal
@@ -76,7 +80,6 @@ class Menu:
         except ValueError:
             print("Value Error")
 
-
     def fnc_get_i(self):
         i = Instructions(self)
         i.lbl_i_text.configure(text="<<< Placeholder >>>")
@@ -101,7 +104,8 @@ class Game:
 
         # Create Window
         self.box_g = Toplevel()
-        self.box_g.protocol('WM_DELETE_WINDOW', partial(self.fnc_g_close, menu))
+        self.box_g.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_g_close, menu))
 
         # Main Frame
         self.frm_g = Frame(self.box_g, width=100, height=100, bg=bg_colour)
@@ -116,11 +120,13 @@ class Game:
         self.lbl_g_heading.grid(row=0)
 
         # Game Cartogram and Questions Frame (Row 1)
-        self.frm_g_game = Frame(self.frm_g, width=100, height=100, bg=bg_colour)
+        self.frm_g_game = Frame(self.frm_g, width=100, height=100,
+                                bg=bg_colour)
         self.frm_g_game.grid(row=1)
 
         # Questions Frame (Row 1 / Row 0)
-        self.frm_g_internal = Frame(self.frm_g_game, width=100, height=20, bg=bg_colour)
+        self.frm_g_internal = Frame(self.frm_g_game, width=100, height=20,
+                                    bg=bg_colour)
         self.frm_g_internal.grid(row=0)
 
         # Basic Question Label
@@ -133,11 +139,13 @@ class Game:
         self.lbl_g_question.grid(row=1)
 
         # Cartogram Frame (Row 1 / Row 1)
-        self.frm_cartogram = Frame(self.frm_g_game, width=100, height=100, bg=bg_colour)
+        self.frm_cartogram = Frame(self.frm_g_game, width=100, height=100,
+                                   bg=bg_colour)
         self.frm_cartogram.grid(row=1)
 
         # Footer Frame (Row 2)
-        self.frm_g_footer = Frame(self.frm_g, width=100, height=20, bg=bg_colour)
+        self.frm_g_footer = Frame(self.frm_g, width=100, height=20,
+                                  bg=bg_colour)
         self.frm_g_footer.grid(row=2)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
@@ -168,12 +176,14 @@ class Game:
     # Game Routine Function
     def fnc_game_intialise(self):
         # Create List for Storing Selected State Objects along with other Variables
-        self.lst_selected_states = [""]  # Placeholder Item so that 0 is not an Index.
-        self.var_selection_index = 0 # To save index of selected item
-        self.var_current_question = False # Boolean to determine whether there is a current question
-        self.lst_tally = [0,0] # Saves results (correct/incorrect)
+        self.lst_selected_states = [
+            ""]  # Placeholder Item so that 0 is not an Index.
+        self.var_selection_index = 0  # To save index of selected item
+        self.var_current_question = False  # Boolean to determine whether there is a current question
+        self.lst_tally = [0, 0]  # Saves results (correct/incorrect)
         # Generate Question
-        self.fnc_internal_results("Loaded", "white") # Initial placeholder display
+        self.fnc_internal_results("Loaded",
+                                  "white")  # Initial placeholder display
 
     # Generate Cartogram Function
     def fnc_generate_cartogram(self, frame, game_function):
@@ -182,24 +192,28 @@ class Game:
 
         # Create Blank List in Which States are Stored (Only if for new game)
         if game_function:
-            self.lst_state_objects = [] # Only edits list if game function, otherwise it interferes with the current game
+            self.lst_state_objects = []  # Only edits list if game function, otherwise it interferes with the current game
         # 8 Rows, 11 Columns
-        with open('SUS_States.csv', newline='', encoding='utf-8-sig') as csvfile: # Open .csv file
+        with open('SUS_States.csv', newline='',
+                  encoding='utf-8-sig') as csvfile:  # Open .csv file
             filereader = csv.reader(csvfile, delimiter=',')
             lst_state_csv = []
             for line in filereader:
-                lst_state_csv.append([line[0], [line[1], line[2]]]) # Create list of items from csv
-        for i in lst_state_csv: # for each row in csv
-            state = State(frame, game_function, i[0], i[1][0], i[1][1]) # Create state object
+                lst_state_csv.append([line[0], [line[1], line[
+                    2]]])  # Create list of items from csv
+        for i in lst_state_csv:  # for each row in csv
+            state = State(frame, game_function, i[0], i[1][0],
+                          i[1][1])  # Create state object
             if game_function:
-                self.lst_state_objects.append(state) # only edit list if game function
+                self.lst_state_objects.append(
+                    state)  # only edit list if game function
 
     # Generate Question Function
     def fnc_generate_question(self):
         import random
 
         # Destroy Generate Question Button
-        self.btn_g_question.destroy() # Remove new question button
+        self.btn_g_question.destroy()  # Remove new question button
 
         # Boolean Variable for Current Question
         self.var_current_question = True
@@ -207,8 +221,11 @@ class Game:
         self.var_current_attempts = 0
 
         # Create Question Label (Row 1 / Row 0 / Row 1)
-        self.obj_selected_state = self.lst_state_objects[random.randint(0, len(self.lst_state_objects) - 1)]
-        self.lbl_g_question.configure(text="Which State is {}?".format(self.obj_selected_state.name), bg="white")
+        self.obj_selected_state = self.lst_state_objects[
+            random.randint(0, len(self.lst_state_objects) - 1)]
+        self.lbl_g_question.configure(
+            text="Which State is {}?".format(self.obj_selected_state.name),
+            bg="white")
         # Add Newly Selected State to Selected List
         self.lst_selected_states.append(self.obj_selected_state)
         # Increase Current Selection Index
@@ -216,7 +233,8 @@ class Game:
 
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text="", highlightbackground="white", state=NORMAL)
+            obj.btn_state.configure(text="", highlightbackground="white",
+                                    state=NORMAL)
 
     # Create Internal Results Function
     def fnc_internal_results(self, result_text, lbl_colour):
@@ -224,31 +242,24 @@ class Game:
         # Check if Game is Over
         # Create Internal Results GUI
         # Configure Question Label
-        text = result_text + " | " + "{} Correct / {} Incorrect".format(self.lst_tally[0], self.lst_tally[1])
+        text = result_text + " | " + "{} Correct / {} Incorrect".format(
+            self.lst_tally[0], self.lst_tally[1])
         self.lbl_g_question.configure(text=text, bg=lbl_colour)
 
         # Generate Question Button (Row 2)
         self.btn_g_question = Button(self.frm_g_internal,
-                                        text="New Question",
-                                         width=10, height=2,
-                                         padx=1, pady=1,
-                                         command=self.fnc_generate_question)
+                                     text="New Question",
+                                     width=10, height=2,
+                                     padx=1, pady=1,
+                                     command=self.fnc_generate_question)
         self.btn_g_question.grid(row=2)
         if self.q_count < 0:
-            self.btn_g_question.configure(text="Quit", command=partial(self.fnc_g_close, self.menu), highlightbackground="green")
+            self.btn_g_question.configure(text="Quit",
+                                          command=partial(self.fnc_g_close,
+                                                          self.menu),
+                                          highlightbackground="green")
 
-            # Write to a csv file
-            from csv import writer
-            # open the file in the write mode
-            with open('SUS_Saved_Results.csv', 'a', newline='', encoding='utf-8-sig') as f_object:
-                # create the csv writer
-                writer_object = writer(f_object)
-
-                # Pass the list as an argument into
-                # the writerow()
-                writer_object.writerow(self.lst_tally)
-                # Close the file object
-                f_object.close()
+            er = External_Results(self)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
@@ -297,7 +308,8 @@ class State:
                                          highlightbackground="green")
                 self.obj_game.var_current_question = False
                 self.obj_game.lst_tally[0] += 1  # Add one to correct tally
-                self.obj_game.fnc_internal_results("Correct", "green")  # Generate Internal Results
+                self.obj_game.fnc_internal_results("Correct",
+                                                   "green")  # Generate Internal Results
             else:
                 self.btn_state.configure(text=self.name,
                                          highlightbackground="red",
@@ -305,8 +317,101 @@ class State:
                 self.obj_game.var_current_attempts += 1
                 if self.obj_game.var_current_attempts >= 3:
                     self.obj_game.var_current_question = False
-                    self.obj_game.lst_tally[1] += 1  # Add one to incorrect tally
+                    self.obj_game.lst_tally[
+                        1] += 1  # Add one to incorrect tally
                     self.obj_game.fnc_internal_results("Incorrect", "red")
+
+
+# External Results Class
+class External_Results:
+    # Initialize Function
+    def __init__(self, obj_game):
+        # Define Formatting Variables
+        bg_colour = "grey"
+        self.obj_game = obj_game
+        # Create Window
+        self.box_er = Toplevel()
+
+        # Main Frame
+        self.frm_er = Frame(self.box_er, width=100, height=100, bg=bg_colour)
+        self.frm_er.grid()
+
+        # Heading (Row 0)
+        self.lbl_er_heading = Label(self.frm_er,
+                                    text="External Results",
+                                    font=("Arial", "16", "bold"),
+                                    bg=bg_colour,
+                                    padx=10, pady=5)
+        self.lbl_er_heading.grid(row=0)
+
+        # Tally Label (Row 1)
+        self.lbl_er_tally = Label(self.frm_er,
+                                  # Format Random Name from State List into Generic Statement
+                                  text="{} Correct / {} Incorrect".format(
+                                      obj_game.lst_tally[0],
+                                      obj_game.lst_tally[1]),
+                                  font=("Arial", "16", "bold"),
+                                  bg=bg_colour,
+                                  padx=10, pady=5)
+        self.lbl_er_tally.grid(row=1)
+
+        # Saving Frame (Row 2)
+        self.frm_er_saving = Frame(self.frm_er, width=100, height=50,
+                                   bg=bg_colour)
+        self.frm_er_saving.grid()
+
+        # Entry Box (Row 2, / Row 0, Column 0)
+        self.ent_er_username = Entry(self.frm_er_saving,
+                                     width=15,
+                                     font=("Arial", "14", "bold"),
+                                     justify=CENTER)
+        self.ent_er_username.grid(row=0, column=0)
+
+        # Save Results Button (Row 2 / Row 0, Column 1)
+        self.btn_er_save = Button(self.frm_er_saving,
+                                  text="Save Results",
+                                  width=15, height=2,
+                                  padx=1, pady=1,
+                                  command=self.fnc_er_save_results)
+        self.btn_er_save.grid(row=0, column=1)
+
+        # Footer Frame (Row 3)
+        self.frm_er_footer = Frame(self.frm_er, width=100, height=20,
+                                   bg=bg_colour)
+        self.frm_er_footer.grid(row=3)
+
+        # Quit Button (Row 2 / Row 0, Column 1)
+        self.btn_er_quit = Button(self.frm_er_footer,
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=self.fnc_er_quit)
+        self.btn_er_quit.grid(row=0, column=1)
+
+    # Close Window Function
+    def fnc_er_save_results(self):
+        # Get Username
+        username = self.ent_er_username.get()
+        # Create list for storing Username and Tally
+        append_row = [username, self.obj_game.lst_tally[0], self.obj_game.lst_tally[1]]
+        # Write to a csv file
+        from csv import writer
+        # open the file in the append mode
+        with open('SUS_Saved_Results.csv', 'a', newline='',
+                  encoding='utf-8-sig') as f_object:
+            # create the csv writer
+            writer_object = writer(f_object)
+
+            # Pass the list as an argument into
+            # the writerow()
+            writer_object.writerow(append_row)
+            # Close the file object
+            f_object.close()
+
+    # Close Window Function
+    def fnc_er_quit(self):
+        # Close Window
+        self.box_er.destroy()
 
 
 # Cartogram GUI Class
@@ -321,7 +426,8 @@ class Cartogram:
 
         # Create Window
         self.box_c = Toplevel()
-        self.box_c.protocol('WM_DELETE_WINDOW', partial(self.fnc_c_close, game))
+        self.box_c.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_c_close, game))
 
         # Main Frame
         self.frm_c = Frame(self.box_c, width=100, height=100, bg=bg_colour)
@@ -336,11 +442,13 @@ class Cartogram:
         self.lbl_c_heading.grid(row=0)
 
         # Cartogram Frame (Row 1)
-        self.frm_cartogram = Frame(self.frm_c, width=100, height=100, bg=bg_colour)
+        self.frm_cartogram = Frame(self.frm_c, width=100, height=100,
+                                   bg=bg_colour)
         self.frm_cartogram.grid(row=1)
 
         # Footer Frame (Row 2)
-        self.frm_c_footer = Frame(self.frm_c, width=100, height=20, bg=bg_colour)
+        self.frm_c_footer = Frame(self.frm_c, width=100, height=20,
+                                  bg=bg_colour)
         self.frm_c_footer.grid(row=2)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
@@ -377,7 +485,8 @@ class Instructions:
 
         # Create Window
         self.box_i = Toplevel()
-        self.box_i.protocol('WM_DELETE_WINDOW', partial(self.fnc_i_close, menu))
+        self.box_i.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_i_close, menu))
 
         # Main Frame
         self.frm_i = Frame(self.box_i, width=100, height=100, bg=bg_colour)
@@ -400,7 +509,8 @@ class Instructions:
         self.lbl_i_text.grid(row=1)
 
         # Footer Frame (Row 2)
-        self.frm_i_footer = Frame(self.frm_i, width=100, height=20, bg=bg_colour)
+        self.frm_i_footer = Frame(self.frm_i, width=100, height=20,
+                                  bg=bg_colour)
         self.frm_i_footer.grid(row=2)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
@@ -433,7 +543,8 @@ class Results:
 
         # Create Window
         self.box_r = Toplevel()
-        self.box_r.protocol('WM_DELETE_WINDOW', partial(self.fnc_r_close, menu))
+        self.box_r.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_r_close, menu))
 
         # Main Frame
         self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
@@ -456,7 +567,8 @@ class Results:
         self.lbl_r_text.grid(row=1)
 
         # Footer Frame (Row 2)
-        self.frm_r_footer = Frame(self.frm_r, width=100, height=20, bg=bg_colour)
+        self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
+                                  bg=bg_colour)
         self.frm_r_footer.grid(row=2)
 
         # So that Width and Height is Measured in Pixels, Create 1x1 Image
