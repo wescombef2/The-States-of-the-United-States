@@ -1,9 +1,8 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 3.0 - Created External Results Class that is called from internal results,
-shifted results saving functionality to button in this class, that gets username
-from an entry box and appends that to csv file alongside tally.
+Version 3.1 – Created Message Box class and added usability to external results
+window, on saving the program will display a success message and return to menu.
 12/08/21
 """
 
@@ -104,8 +103,6 @@ class Game:
 
         # Create Window
         self.box_g = Toplevel()
-        self.box_g.protocol('WM_DELETE_WINDOW',
-                            partial(self.fnc_g_close, menu))
 
         # Main Frame
         self.frm_g = Frame(self.box_g, width=100, height=100, bg=bg_colour)
@@ -158,14 +155,6 @@ class Game:
                                       padx=1, pady=1,
                                       command=self.fnc_get_c)
         self.btn_g_cartogram.grid(row=0, column=0)
-
-        # Close Button (Row 2 / Row 0, Column 1)
-        self.btn_g_close = Button(self.frm_g_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=partial(self.fnc_g_close, menu))
-        self.btn_g_close.grid(row=0, column=1)
 
         # Generate Cartogram
         self.fnc_generate_cartogram(self, True)
@@ -247,30 +236,19 @@ class Game:
         self.lbl_g_question.configure(text=text, bg=lbl_colour)
 
         # Generate Question Button (Row 2)
-        self.btn_g_question = Button(self.frm_g_internal,
-                                     text="New Question",
-                                     width=10, height=2,
-                                     padx=1, pady=1,
-                                     command=self.fnc_generate_question)
-        self.btn_g_question.grid(row=2)
-        if self.q_count < 0:
-            self.btn_g_question.configure(text="Quit",
-                                          command=partial(self.fnc_g_close,
-                                                          self.menu),
-                                          highlightbackground="green")
-
+        if self.q_count >= 0:
+            self.btn_g_question = Button(self.frm_g_internal,
+                                         text="New Question",
+                                         width=10, height=2,
+                                         padx=1, pady=1,
+                                         command=self.fnc_generate_question)
+            self.btn_g_question.grid(row=2)
+        else:
             er = External_Results(self)
 
     # Create Cartogram Window Function
     def fnc_get_c(self):
         c = Cartogram(self)
-
-    # Close Window Function
-    def fnc_g_close(self, menu):
-        # Re-enable Help Button
-        menu.btn_m_game.configure(state=NORMAL)
-        # Close Window
-        self.box_g.destroy()
 
 
 # State Class
@@ -331,6 +309,7 @@ class External_Results:
         self.obj_game = obj_game
         # Create Window
         self.box_er = Toplevel()
+        self.box_er.protocol('WM_DELETE_WINDOW',self.fnc_er_quit)
 
         # Main Frame
         self.frm_er = Frame(self.box_er, width=100, height=100, bg=bg_colour)
@@ -408,10 +387,64 @@ class External_Results:
             # Close the file object
             f_object.close()
 
+        self.fnc_get_success_message()
+        # Destroy both game window and external results window
+        self.box_er.destroy()
+        self.obj_game.box_g.destroy()
+        # Re-enable Play Button
+        self.obj_game.menu.btn_m_game.configure(state=NORMAL)
+
+    # Display Success Message
+    def fnc_get_success_message(self):
+        mb = Message_Box("Save Successful")
+
     # Close Window Function
     def fnc_er_quit(self):
-        # Close Window
+        # Destroy both game window and external results window
         self.box_er.destroy()
+        self.obj_game.box_g.destroy()
+        # Re-enable Play Button
+        self.obj_game.menu.btn_m_game.configure(state=NORMAL)
+
+# Generic Message Box Class
+class Message_Box:
+    # Initialize Function
+    def __init__(self, message):
+        # Define Formatting Variables
+        bg_colour = "grey"
+
+        # Create Window
+        self.box_mb = Toplevel()
+
+        # Main Frame
+        self.frm_mb = Frame(self.box_mb, width=50, height=50, bg=bg_colour)
+        self.frm_mb.grid()
+
+        # Text (Row 0)
+        self.lbl_mb_text = Label(self.frm_mb,
+                                text=message,
+                                font=("Arial", "16"),
+                                bg=bg_colour,
+                                padx=10, pady=10)
+        self.lbl_mb_text.grid(row=0)
+
+        # Footer Frame (Row 1)
+        self.frm_mb_footer = Frame(self.frm_mb, width=100, height=20,
+                                  bg=bg_colour)
+        self.frm_mb_footer.grid(row=1)
+
+        # Close Button (Row 1 / Row 0)
+        self.btn_mb_close = Button(self.frm_mb_footer,
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=self.fnc_mb_close)
+        self.btn_mb_close.grid(row=0)
+
+    def fnc_mb_close(self):
+        # Close Window
+        self.box_mb.destroy()
+
 
 
 # Cartogram GUI Class
