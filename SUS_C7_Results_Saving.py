@@ -1,9 +1,7 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 4.1 – Multiplied percentages by one hundred and rounded to one decimal
-point (displaying them as percentages instead of decimals). Given white background
-to text label to make it stand out more.
+Version 4.2 – Added message when there are no results matching the given username.
 12/08/21
 """
 
@@ -613,7 +611,10 @@ class Results:
         matching_results = ""
         for r in lst_matching_results:
             matching_results += self.fnc_r_lst_to_txt(r)
-        self.lbl_r_text.configure(text=matching_results)
+        if matching_results:
+            self.lbl_r_text.configure(text=matching_results)
+        else: # Display message if no results
+            self.lbl_r_text.configure(text="There are no results with this username.")
 
     def fnc_r_lst_to_txt(self, input):
         txt = "{} | {:.1f}% ({} Correct / {} Incorrect)\n".format(input[0], input[3], input[1], input[2])
