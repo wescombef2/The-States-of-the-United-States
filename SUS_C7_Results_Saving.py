@@ -1,8 +1,10 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 3.1 – Created Message Box class and added usability to external results
-window, on saving the program will display a success message and return to menu.
+Version 4.0 – Changed the Results Class to include an entry box for a username.
+The class reads the saved results csv file and puts each row into a list. It
+displays the top results, and pressing a search button causes it to display
+results matching the given username.
 12/08/21
 """
 
@@ -81,11 +83,9 @@ class Menu:
 
     def fnc_get_i(self):
         i = Instructions(self)
-        i.lbl_i_text.configure(text="<<< Placeholder >>>")
 
     def fnc_get_r(self):
         r = Results(self)
-        r.lbl_r_text.configure(text="<<< Placeholder >>>")
 
 
 # Game GUI Class
@@ -406,6 +406,7 @@ class External_Results:
         # Re-enable Play Button
         self.obj_game.menu.btn_m_game.configure(state=NORMAL)
 
+
 # Generic Message Box Class
 class Message_Box:
     # Initialize Function
@@ -444,7 +445,6 @@ class Message_Box:
     def fnc_mb_close(self):
         # Close Window
         self.box_mb.destroy()
-
 
 
 # Cartogram GUI Class
@@ -506,6 +506,121 @@ class Cartogram:
         self.box_c.destroy()
 
 
+# Past Results GUI Class
+class Results:
+    # Initialize Function
+    def __init__(self, menu):
+        # Define Formatting Variables
+        bg_colour = "grey"
+
+        # Disable Button in Menu
+        menu.btn_m_results.configure(state=DISABLED)
+
+        # Read csv file
+        import csv
+        from operator import itemgetter # For sorting
+
+        # Create Blank List in Which Results are Stored
+        self.lst_results = []
+
+        with open('SUS_Saved_Results.csv', newline='', encoding='utf-8-sig') as csvfile:  # Open .csv file
+            filereader = csv.reader(csvfile, delimiter=',')
+            lst_results = []
+            for line in filereader:
+                percentage = int(line[1])/(int(line[1])+int(line[2]))
+                lst_results.append([line[0], int(line[1]), int(line[2]), percentage])  # Create list of items from csv
+        # Sort list results by percentage
+        self.lst_sorted_results = sorted(lst_results, key=itemgetter(3), reverse=True)
+
+        # Create Window
+        self.box_r = Toplevel()
+        self.box_r.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_r_close, menu))
+
+        # Main Frame
+        self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
+        self.frm_r.grid()
+
+        # Heading (Row 0)
+        self.lbl_r_heading = Label(self.frm_r,
+                                   text="Past Results",
+                                   font=("Arial", "16", "bold"),
+                                   bg=bg_colour,
+                                   padx=10, pady=5)
+        self.lbl_r_heading.grid(row=0)
+
+        # Searching Frame (Row 1)
+        self.frm_r_search = Frame(self.frm_r, width=100, height=50,
+                                   bg=bg_colour)
+        self.frm_r_search.grid(row=1)
+
+        # Entry Box (Row 1, / Row 0, Column 0)
+        self.ent_r_username = Entry(self.frm_r_search,
+                                     width=15,
+                                     font=("Arial", "14", "bold"),
+                                     justify=CENTER)
+        self.ent_r_username.grid(row=0, column=0)
+
+        # Save Results Button (Row 1 / Row 0, Column 1)
+        self.btn_r_search = Button(self.frm_r_search,
+                                  text="Search Results",
+                                  width=15, height=2,
+                                  padx=1, pady=1,
+                                  command=self.fnc_r_search_results)
+        self.btn_r_search.grid(row=0, column=1)
+
+
+        # Results Text (Row 2)
+        self.lbl_r_text = Label(self.frm_r,
+                                text="",
+                                font=("Arial", "12"),
+                                bg=bg_colour,
+                                padx=10, pady=10)
+        self.lbl_r_text.grid(row=2)
+
+        # Footer Frame (Row 3)
+        self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
+                                  bg=bg_colour)
+        self.frm_r_footer.grid(row=3)
+
+        # Close Button (Row 3 / Row 0)
+        self.btn_r_close = Button(self.frm_r_footer,
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_r_close, menu))
+        self.btn_r_close.grid(row=0)
+
+        # Configure Results Text
+        highest_results = ""
+        for i in range(0,5):
+            highest_results += self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
+        self.lbl_r_text.configure(text=highest_results)
+
+    def fnc_r_close(self, menu):
+        # Re-enable Help Button
+        menu.btn_m_results.configure(state=NORMAL)
+        # Close Window
+        self.box_r.destroy()
+
+    def fnc_r_search_results(self):
+        # Get search username
+        var_search_username = self.ent_r_username.get()
+        lst_matching_results = []
+        for r in self.lst_sorted_results:
+            if r[0] == var_search_username:
+                lst_matching_results.append(r)
+
+        matching_results = ""
+        for r in lst_matching_results:
+            matching_results += self.fnc_r_lst_to_txt(r)
+        self.lbl_r_text.configure(text=matching_results)
+
+    def fnc_r_lst_to_txt(self, input):
+        txt = "{} | {} ({} Correct / {} Incorrect)\n".format(input[0], input[3], input[1], input[2])
+        return txt
+
+
 # Instructions GUI Class
 class Instructions:
     # Initialize Function
@@ -562,65 +677,6 @@ class Instructions:
         menu.btn_m_instructions.configure(state=NORMAL)
         # Close Window
         self.box_i.destroy()
-
-
-# Past Results GUI Class
-class Results:
-    # Initialize Function
-    def __init__(self, menu):
-        # Define Formatting Variables
-        bg_colour = "grey"
-
-        # Disable Button in Menu
-        menu.btn_m_results.configure(state=DISABLED)
-
-        # Create Window
-        self.box_r = Toplevel()
-        self.box_r.protocol('WM_DELETE_WINDOW',
-                            partial(self.fnc_r_close, menu))
-
-        # Main Frame
-        self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
-        self.frm_r.grid()
-
-        # Heading (Row 0)
-        self.lbl_r_heading = Label(self.frm_r,
-                                   text="Past Results",
-                                   font=("Arial", "16", "bold"),
-                                   bg=bg_colour,
-                                   padx=10, pady=5)
-        self.lbl_r_heading.grid(row=0)
-
-        # Results Text (Row 1)
-        self.lbl_r_text = Label(self.frm_r,
-                                text="",
-                                font=("Arial", "12"),
-                                bg=bg_colour,
-                                padx=10, pady=10)
-        self.lbl_r_text.grid(row=1)
-
-        # Footer Frame (Row 2)
-        self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
-                                  bg=bg_colour)
-        self.frm_r_footer.grid(row=2)
-
-        # So that Width and Height is Measured in Pixels, Create 1x1 Image
-        pixel_image = PhotoImage(width=1, height=1)
-
-        # Close Button (Row 2 / Row 0)
-        self.btn_r_close = Button(self.frm_r_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=partial(self.fnc_r_close, menu))
-        self.btn_r_close.grid(row=0)
-
-    def fnc_r_close(self, menu):
-        # Re-enable Help Button
-        menu.btn_m_results.configure(state=NORMAL)
-        # Close Window
-        self.box_r.destroy()
-
 
 # Main Routine
 
