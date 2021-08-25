@@ -1,10 +1,9 @@
 """
 The States of the United States
 Component 07 - Results and Saving
-Version 4.0 – Changed the Results Class to include an entry box for a username.
-The class reads the saved results csv file and puts each row into a list. It
-displays the top results, and pressing a search button causes it to display
-results matching the given username.
+Version 4.1 – Multiplied percentages by one hundred and rounded to one decimal
+point (displaying them as percentages instead of decimals). Given white background
+to text label to make it stand out more.
 12/08/21
 """
 
@@ -527,7 +526,7 @@ class Results:
             filereader = csv.reader(csvfile, delimiter=',')
             lst_results = []
             for line in filereader:
-                percentage = int(line[1])/(int(line[1])+int(line[2]))
+                percentage = (int(line[1])/(int(line[1])+int(line[2])))*100
                 lst_results.append([line[0], int(line[1]), int(line[2]), percentage])  # Create list of items from csv
         # Sort list results by percentage
         self.lst_sorted_results = sorted(lst_results, key=itemgetter(3), reverse=True)
@@ -574,7 +573,7 @@ class Results:
         self.lbl_r_text = Label(self.frm_r,
                                 text="",
                                 font=("Arial", "12"),
-                                bg=bg_colour,
+                                bg="white",
                                 padx=10, pady=10)
         self.lbl_r_text.grid(row=2)
 
@@ -617,7 +616,7 @@ class Results:
         self.lbl_r_text.configure(text=matching_results)
 
     def fnc_r_lst_to_txt(self, input):
-        txt = "{} | {} ({} Correct / {} Incorrect)\n".format(input[0], input[3], input[1], input[2])
+        txt = "{} | {:.1f}% ({} Correct / {} Incorrect)\n".format(input[0], input[3], input[1], input[2])
         return txt
 
 
