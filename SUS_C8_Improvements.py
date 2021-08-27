@@ -1,9 +1,10 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 1.2 – Created a header frame for the game window that is configured
-appropriately for questions, internal results, and external results, for
-increased efficiency for both the program and user.
+Version 1.3 – Added close button to external results. Added specific message to
+‘Save Successful’ message box. Reduced Game Window Size. Cleared State colours
+in External Results and added 'Game Over' message. Forced Username for Save with
+watermark text showing after save attempt.
 25/08/21
 """
 
@@ -336,6 +337,11 @@ class Game:
 
     # Generate External Results Functions
     def fnc_external_results(self):
+        # Return All States to White and no Name, Enabled
+        for obj in self.lst_state_objects:
+            obj.btn_state.configure(text="", bg="white",
+                                    state=NORMAL)
+
         # Configure Header Label
         text = "{} Correct / {} Incorrect".format(
             self.lst_tally[0], self.lst_tally[1])
@@ -361,16 +367,33 @@ class Game:
         # Username Entry Box (Row 1 / Row 0, Column 0 / Row 1)
         self.ent_username = Entry(self.frm_username,
                                   width=15,
-                                  font=("Arial", "14", "bold"),
+                                  font=("Arial", "12", "bold"),
+                                  fg="black",
                                   justify=CENTER)
         self.ent_username.grid(row=1)
+
+        # Close Button (Column 2)
+        self.btn_close = Button(self.frm_header_widgets,
+                                text="Quit without\n"
+                                     "Saving",
+                                font=("Arial", "11", "bold"),
+                                width=10, height=2,
+                                padx=1, pady=1,
+                                command=self.fnc_g_close)
+        self.btn_close.grid(row=0, column=2, sticky=E)
 
     # Save Results Function
     def fnc_save_results(self):
         # Get Username
-        username = self.ent_username.get()
+        self.username = self.ent_username.get()
+        # Check if Username
+        if not self.username:  # If not
+            self.ent_username.configure(fg="red")
+            self.ent_username.insert(0, 'Required')
+            self.ent_username.bind("<FocusIn>", lambda args: self.ent_username.delete('0', 'end'))  # Emphasize entry box
+            return  # End Function
         # Create list for storing Username and Tally
-        append_row = [username, self.lst_tally[0], self.lst_tally[1]]
+        self.append_row = [self.username, self.lst_tally[0], self.lst_tally[1]]
         # Write to a csv file
         from csv import writer
         # open the file in the append mode
@@ -381,17 +404,19 @@ class Game:
 
             # Pass the list as an argument into
             # the writerow()
-            writer_object.writerow(append_row)
+            writer_object.writerow(self.append_row)
             # Close the file object
             f_object.close()
 
-        self.fnc_get_message()
+        self.fnc_get_save_message()
         # Destroy game window
         self.fnc_g_close()
 
     # Display Save Success Message
-    def fnc_get_message(self):
-        mb = Message_Box("Save Successful", "", "", "")
+    def fnc_get_save_message(self):
+        message_text = "Saved: {} ({} Correct /{} Incorrect)". \
+            format(self.username, self.lst_tally[0], self.lst_tally[1])
+        mb = Message_Box("Save Successful", message_text, "", "")
 
     # Close Window Function
     def fnc_g_close(self):
@@ -399,6 +424,7 @@ class Game:
         self.menu.btn_m_game.configure(state=NORMAL)
         # Close Window
         self.box_g.destroy()
+
 
 # State Class
 class State:
@@ -413,7 +439,7 @@ class State:
                                 text=self.name,
                                 fg="white",
                                 font=("Arial", "9", "bold"),
-                                width=12, height=6,
+                                width=8, height=4,
                                 borderwidth=4,
                                 relief="sunken",
                                 state=NORMAL)
@@ -540,7 +566,7 @@ class Results:
             lst_results = []
             for line in filereader:
                 percentage = (int(line[1]) / (
-                            int(line[1]) + int(line[2]))) * 100
+                        int(line[1]) + int(line[2]))) * 100
                 lst_results.append([line[0], int(line[1]), int(line[2]),
                                     percentage])  # Create list of items from csv
         # Sort list results by percentage
