@@ -1,8 +1,9 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 1.0 – Added Logo, changed colour scheme to white, blue, and red, changed
-highlight backgrounds for backgrounds (no longer working on Mac).
+Version 1.1 – Repurposed the Message Box Class created for the Save Success
+message to replace the Instructions class as well as being more widely usable.
+Added Instruction text.
 25/08/21
 """
 
@@ -11,6 +12,7 @@ from tkinter import *  # For GUI Display
 from tkinter import ttk  # For Combobox
 from functools import partial  # To Prevent Unwanted Windows
 from PIL import Image, ImageTk
+
 
 # Menu GUI Class
 class Menu:
@@ -93,13 +95,92 @@ class Menu:
             print("Value Error")
 
     def fnc_get_i(self):
-        i = Instructions(self)
-
+        instruction_text = "The States of the United States is a memory-based\n" \
+                           "quiz around the locations of the states in a box\n" \
+                           "cartographic form. To begin the game, select the quiz\n" \
+                           "type and press 'Play' play in the menu. The game will\n" \
+                           "provide a blank cartogram and a question; to answer,\n" \
+                           "you must press the correct state within three tries.\n" \
+                           "When you have answered all questions, whether correct\n" \
+                           "or incorrect, the game will end and you will have the\n" \
+                           "chance to save your results with a username before\n" \
+                           "you return to the menu. This is optional. "
+        i = Message_Box("Instructions", instruction_text, "", self.btn_m_instructions)
+        i.lbl_mb_text.configure(height=10, anchor=N)
     def fnc_get_r(self):
         r = Results(self)
 
 
-# Game GUI Class
+# Message Box Class
+class Message_Box:
+    # Initialize Function
+    def __init__(self, heading, text, footer_text, partner_button):
+
+        # For Disable/Reenable Buttons
+        if partner_button:
+            self.partner_button = partner_button
+            self.partner_button.configure(state=DISABLED)
+        # Define Formatting Variables
+        bg_colour = "white"
+
+        # Create Window
+        self.box_mb = Toplevel()
+
+        # Main Frame
+        self.frm_mb = Frame(self.box_mb, width=30, height=30, bg=bg_colour)
+        self.frm_mb.grid()
+
+        # Heading (Row 0)
+        self.lbl_mb_heading = Label(self.frm_mb,
+                                   text=heading,
+                                   font=("Arial", "16", "bold"),
+                                   bg="dark blue",
+                                   fg="white",
+                                   width=30,
+                                   padx=10, pady=5)
+        self.lbl_mb_heading.grid(row=0)
+
+        # Text (Row 1)
+        self.lbl_mb_text = Label(self.frm_mb,
+                                text=text,
+                                font=("Arial", "12"),
+                                bg="white",
+                                fg="black",
+                                width=38,
+                                padx=20, pady=10)
+        self.lbl_mb_text.grid(row=1)
+
+        # Footer Frame (Row 2)
+        self.frm_mb_footer = Frame(self.frm_mb, width=30, height=20,
+                                  bg=bg_colour)
+        self.frm_mb_footer.grid(row=2)
+
+        # Footer Text (Row 2 / Row 0, Column 0)
+        self.lbl_mb_foottext = Label(self.frm_mb_footer,
+                                text=footer_text,
+                                font=("Arial", "16"),
+                                bg="white",
+                                fg="black",
+                                width=30,
+                                padx=10, pady=10)
+        self.lbl_mb_foottext.grid(row=0)
+
+        # Close Button (Row 2 / Row 0, Column 1)
+        self.btn_mb_close = Button(self.frm_mb_footer,
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=self.fnc_mb_close)
+        self.btn_mb_close.grid(row=0)
+
+    def fnc_mb_close(self):
+        # Re-enable Help Button
+        self.partner_button.configure(state=NORMAL)
+        # Close Window
+        self.box_mb.destroy()
+
+
+# Game Class
 class Game:
     # Initialize Function
     def __init__(self, menu, q_opt):
@@ -401,7 +482,7 @@ class External_Results:
 
     # Display Success Message
     def fnc_get_success_message(self):
-        mb = Message_Box("Save Successful")
+        mb = Message_Box("Save Successful", "", "", "")
 
     # Close Window Function
     def fnc_er_quit(self):
@@ -410,48 +491,6 @@ class External_Results:
         self.obj_game.box_g.destroy()
         # Re-enable Play Button
         self.obj_game.menu.btn_m_game.configure(state=NORMAL)
-
-
-# Generic Message Box Class
-class Message_Box:
-    # Initialize Function
-    def __init__(self, message):
-        # Define Formatting Variables
-        bg_colour = "white"
-
-        # Create Window
-        self.box_mb = Toplevel()
-
-        # Main Frame
-        self.frm_mb = Frame(self.box_mb, width=50, height=50, bg=bg_colour)
-        self.frm_mb.grid()
-
-        # Text (Row 0)
-        self.lbl_mb_text = Label(self.frm_mb,
-                                text=message,
-                                font=("Arial", "16"),
-                                bg="dark blue",
-                                fg="white",
-                                width=50,
-                                padx=10, pady=10)
-        self.lbl_mb_text.grid(row=0)
-
-        # Footer Frame (Row 1)
-        self.frm_mb_footer = Frame(self.frm_mb, width=100, height=20,
-                                  bg=bg_colour)
-        self.frm_mb_footer.grid(row=1)
-
-        # Close Button (Row 1 / Row 0)
-        self.btn_mb_close = Button(self.frm_mb_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=self.fnc_mb_close)
-        self.btn_mb_close.grid(row=0)
-
-    def fnc_mb_close(self):
-        # Close Window
-        self.box_mb.destroy()
 
 
 # Cartogram GUI Class
@@ -634,65 +673,6 @@ class Results:
         txt = "{} | {:.1f}% ({} Correct / {} Incorrect)\n".format(input[0], input[3], input[1], input[2])
         return txt
 
-
-# Instructions GUI Class
-class Instructions:
-    # Initialize Function
-    def __init__(self, menu):
-        # Define Formatting Variables
-        bg_colour = "white"
-
-        # Disable Button in Menu
-        menu.btn_m_instructions.configure(state=DISABLED)
-
-        # Create Window
-        self.box_i = Toplevel()
-        self.box_i.protocol('WM_DELETE_WINDOW',
-                            partial(self.fnc_i_close, menu))
-
-        # Main Frame
-        self.frm_i = Frame(self.box_i, width=100, height=100, bg=bg_colour)
-        self.frm_i.grid()
-
-        # Heading (Row 0)
-        self.lbl_i_heading = Label(self.frm_i,
-                                   text="Instructions",
-                                   font=("Arial", "16", "bold"),
-                                   bg="dark blue",
-                                   fg="white",
-                                   width=50,
-                                   padx=10, pady=5)
-        self.lbl_i_heading.grid(row=0)
-
-        # Instruction Text (Row 1)
-        self.lbl_i_text = Label(self.frm_i,
-                                text="",
-                                font=("Arial", "12"),
-                                bg=bg_colour,
-                                padx=10, pady=10)
-        self.lbl_i_text.grid(row=1)
-
-        # Footer Frame (Row 2)
-        self.frm_i_footer = Frame(self.frm_i, width=100, height=20,
-                                  bg=bg_colour)
-        self.frm_i_footer.grid(row=2)
-
-        # So that Width and Height is Measured in Pixels, Create 1x1 Image
-        pixel_image = PhotoImage(width=1, height=1)
-
-        # Close Button (Row 2 / Row 0)
-        self.btn_i_close = Button(self.frm_i_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=partial(self.fnc_i_close, menu))
-        self.btn_i_close.grid(row=0)
-
-    def fnc_i_close(self, menu):
-        # Re-enable Help Button
-        menu.btn_m_instructions.configure(state=NORMAL)
-        # Close Window
-        self.box_i.destroy()
 
 # Main Routine
 
