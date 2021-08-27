@@ -223,7 +223,7 @@ class Game:
         self.lbl_header = Label(self.frm_header, text="",
                                 font=("Arial", "16", "bold"),
                                 bg="dark blue", fg="white",
-                                width=100, padx=30, pady=5)
+                                width=60, padx=30, pady=5)
         self.lbl_header.grid(row=0)
 
         # Header Widget Frame (for results)
@@ -343,7 +343,7 @@ class Game:
                                     state=NORMAL)
 
         # Configure Header Label
-        text = "{} Correct / {} Incorrect".format(
+        text = "Game Over ({} Correct / {} Incorrect)".format(
             self.lst_tally[0], self.lst_tally[1])
         self.lbl_header.configure(text=text, bg="dark blue")
 
