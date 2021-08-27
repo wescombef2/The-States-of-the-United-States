@@ -1,10 +1,8 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 1.3 – Added close button to external results. Added specific message to
-‘Save Successful’ message box. Reduced Game Window Size. Cleared State colours
-in External Results and added 'Game Over' message. Forced Username for Save with
-watermark text showing after save attempt.
+Version 1.4 – Overhauled Past Results GUI display, added watermark ‘Required’
+for menu question options combo-box.
 25/08/21
 """
 
@@ -94,7 +92,7 @@ class Menu:
             q_count = self.ent_m_questions.get()
             g = Game(self, q_count)
         except ValueError:
-            print("Value Error")
+            self.ent_m_questions.set('Required')
 
     def fnc_get_i(self):
         instruction_text = "The States of the United States is a memory-based\n" \
@@ -187,6 +185,183 @@ class Message_Box:
             self.partner_button.configure(state=NORMAL)
         # Close Window
         self.box_mb.destroy()
+
+
+# Past Results GUI Class
+class Results:
+    # Initialize Function
+    def __init__(self, menu):
+        # Define Formatting Variables
+        bg_colour = "white"
+
+        # Disable Button in Menu
+        menu.btn_m_results.configure(state=DISABLED)
+
+        # Read csv file
+        import csv
+        from operator import itemgetter  # For sorting
+
+        # Create Blank List in Which Results are Stored
+        self.lst_results = []
+
+        with open('SUS_Saved_Results.csv', newline='',
+                  encoding='utf-8-sig') as csvfile:  # Open .csv file
+            filereader = csv.reader(csvfile, delimiter=',')
+            lst_results = []
+            for line in filereader:
+                percentage = (int(line[1]) / (
+                        int(line[1]) + int(line[2]))) * 100
+                lst_results.append([line[0], int(line[1]), int(line[2]),
+                                    percentage])  # Create list of items from csv
+        # Sort list results by percentage
+        self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
+                                         reverse=True)
+
+        # Create Window
+        self.box_r = Toplevel()
+        self.box_r.protocol('WM_DELETE_WINDOW',
+                            partial(self.fnc_r_close, menu))
+
+        # Main Frame
+        self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
+        self.frm_r.grid()
+
+        # Heading (Row 0)
+        self.lbl_r_heading = Label(self.frm_r,
+                                   text="Past Results",
+                                   font=("Arial", "16", "bold"),
+                                   bg="dark blue",
+                                   fg="white",
+                                   width=30,
+                                   padx=10, pady=5)
+        self.lbl_r_heading.grid(row=0)
+
+        # Searching Frame (Row 1)
+        self.frm_r_search = Frame(self.frm_r, width=100, height=50,
+                                  bg=bg_colour)
+        self.frm_r_search.grid(row=1)
+
+        # Username Entry Frame (Row 1 / Row 0, Column 0)
+        self.frm_username = Frame(self.frm_r_search, width=10, height=10,
+                                  bg="white")
+        self.frm_username.grid(row=0, column=0)
+
+        # Username Label (Row 1 / Row 0, Column 0 / Row 0)
+        self.lbl_username = Label(self.frm_username,
+                                  text="Enter a Username to Search",
+                                  font=("Arial", "8", "bold"),
+                                  bg="white",
+                                  padx=10, pady=1)
+        self.lbl_username.grid(row=0)
+
+        # Username Entry Box (Row 1 / Row 0, Column 0 / Row 1)
+        self.ent_username = Entry(self.frm_username,
+                                  width=15,
+                                  font=("Arial", "12", "bold"),
+                                  fg="black",
+                                  justify=CENTER)
+        self.ent_username.grid(row=1)
+
+        # Search Results Button (Row 1 / Row 0, Column 1)
+        self.btn_r_search = Button(self.frm_r_search,
+                                   text="Search Results",
+                                   width=15, height=2,
+                                   padx=1, pady=1,
+                                   command=self.fnc_r_search_results)
+        self.btn_r_search.grid(row=0, column=1)
+
+        # Search Results Label (Row 2)
+        self.lbl_search_heading = Label(self.frm_r,
+                                   text="Top Five Results",
+                                   font=("Arial", "8", "bold"),
+                                   bg="dark blue",
+                                   fg="white",
+                                   width=35,
+                                   padx=10, pady=5)
+        self.lbl_search_heading.grid(row=2)
+
+        # Text Frame (Row 3)
+        self.frm_username = Frame(self.frm_r, width=10, height=10,
+                                  bg="white")
+        self.frm_username.grid(row=3)
+
+        # Username Text (Row 3 / Column 0)
+        self.lbl_username_text = Label(self.frm_username,
+                                text="",
+                                font=("Arial", "12"),
+                                bg="white",
+                                padx=10, pady=10)
+        self.lbl_username_text.grid(row=0, column=0)
+
+        # Results Text (Row 3 / Column 1)
+        self.lbl_result_text = Label(self.frm_username,
+                                text="",
+                                font=("Arial", "12"),
+                                bg="white",
+                                padx=10, pady=10)
+        self.lbl_result_text.grid(row=0, column=1)
+
+        # Footer Frame (Row 3)
+        self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
+                                  bg=bg_colour)
+        self.frm_r_footer.grid(row=4)
+
+        # Close Button (Row 3 / Row 0)
+        self.btn_r_close = Button(self.frm_r_footer,
+                                  text="Close",
+                                  width=10, height=2,
+                                  padx=1, pady=1,
+                                  command=partial(self.fnc_r_close, menu))
+        self.btn_r_close.grid(row=0)
+
+        # Configure Results Text
+        usernames = ""
+        results = ""
+        for i in range(0, 5):
+            lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
+            usernames += lst[0]
+            results += lst[1]
+        self.lbl_username_text.configure(text=usernames)
+        self.lbl_result_text.configure(text=results)
+
+    def fnc_r_search_results(self):
+        # Get search username
+        var_search_username = self.ent_username.get()
+
+        lst_matching_results = []
+        for r in self.lst_sorted_results:
+            if r[0] == var_search_username:
+                lst_matching_results.append(r)
+
+        usernames = ""
+        results = ""
+        for r in lst_matching_results:
+            lst = self.fnc_r_lst_to_txt(r)
+            usernames += lst[0]
+            results += lst[1]
+        if usernames:
+            self.lbl_username_text.configure(text=usernames)
+            self.lbl_result_text.configure(text=results)
+            self.lbl_search_heading.configure(text="Search Results for '{}'".
+                                              format(var_search_username),
+                                              bg="dark blue")
+        else:  # Display message if no results
+            self.lbl_username_text.configure(text="")
+            self.lbl_result_text.configure(text="")
+            self.lbl_search_heading.configure(
+                text="There are no results matching '{}'".
+                    format(var_search_username), bg="red")
+
+    def fnc_r_lst_to_txt(self, input):
+        txt_username = "{}\n".format(input[0])
+        txt_result = "[ {:.1f}% ({}/{}) ]\n".format(input[3], input[1], (input[1]+input[2]))
+        return txt_username, txt_result
+
+    def fnc_r_close(self, menu):
+        # Re-enable Help Button
+        menu.btn_m_results.configure(state=NORMAL)
+        # Close Window
+        self.box_r.destroy()
 
 
 # Game Class
@@ -541,134 +716,6 @@ class Cartogram:
         game.btn_g_cartogram.configure(state=NORMAL)
         # Close Window
         self.box_c.destroy()
-
-
-# Past Results GUI Class
-class Results:
-    # Initialize Function
-    def __init__(self, menu):
-        # Define Formatting Variables
-        bg_colour = "white"
-
-        # Disable Button in Menu
-        menu.btn_m_results.configure(state=DISABLED)
-
-        # Read csv file
-        import csv
-        from operator import itemgetter  # For sorting
-
-        # Create Blank List in Which Results are Stored
-        self.lst_results = []
-
-        with open('SUS_Saved_Results.csv', newline='',
-                  encoding='utf-8-sig') as csvfile:  # Open .csv file
-            filereader = csv.reader(csvfile, delimiter=',')
-            lst_results = []
-            for line in filereader:
-                percentage = (int(line[1]) / (
-                        int(line[1]) + int(line[2]))) * 100
-                lst_results.append([line[0], int(line[1]), int(line[2]),
-                                    percentage])  # Create list of items from csv
-        # Sort list results by percentage
-        self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
-                                         reverse=True)
-
-        # Create Window
-        self.box_r = Toplevel()
-        self.box_r.protocol('WM_DELETE_WINDOW',
-                            partial(self.fnc_r_close, menu))
-
-        # Main Frame
-        self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
-        self.frm_r.grid()
-
-        # Heading (Row 0)
-        self.lbl_r_heading = Label(self.frm_r,
-                                   text="Past Results",
-                                   font=("Arial", "16", "bold"),
-                                   bg="dark blue",
-                                   fg="white",
-                                   width=50,
-                                   padx=10, pady=5)
-        self.lbl_r_heading.grid(row=0)
-
-        # Searching Frame (Row 1)
-        self.frm_r_search = Frame(self.frm_r, width=100, height=50,
-                                  bg=bg_colour)
-        self.frm_r_search.grid(row=1)
-
-        # Entry Box (Row 1, / Row 0, Column 0)
-        self.ent_r_username = Entry(self.frm_r_search,
-                                    width=15,
-                                    font=("Arial", "14", "bold"),
-                                    justify=CENTER)
-        self.ent_r_username.grid(row=0, column=0)
-
-        # Save Results Button (Row 1 / Row 0, Column 1)
-        self.btn_r_search = Button(self.frm_r_search,
-                                   text="Search Results",
-                                   width=15, height=2,
-                                   padx=1, pady=1,
-                                   command=self.fnc_r_search_results)
-        self.btn_r_search.grid(row=0, column=1)
-
-        # Results Text (Row 2)
-        self.lbl_r_text = Label(self.frm_r,
-                                text="",
-                                font=("Arial", "12"),
-                                bg="white",
-                                padx=10, pady=10)
-        self.lbl_r_text.grid(row=2)
-
-        # Footer Frame (Row 3)
-        self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
-                                  bg=bg_colour)
-        self.frm_r_footer.grid(row=3)
-
-        # Close Button (Row 3 / Row 0)
-        self.btn_r_close = Button(self.frm_r_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=partial(self.fnc_r_close, menu))
-        self.btn_r_close.grid(row=0)
-
-        # Configure Results Text
-        highest_results = ""
-        for i in range(0, 5):
-            highest_results += self.fnc_r_lst_to_txt(
-                self.lst_sorted_results[i])
-        self.lbl_r_text.configure(text=highest_results)
-
-    def fnc_r_close(self, menu):
-        # Re-enable Help Button
-        menu.btn_m_results.configure(state=NORMAL)
-        # Close Window
-        self.box_r.destroy()
-
-    def fnc_r_search_results(self):
-        # Get search username
-        var_search_username = self.ent_r_username.get()
-        lst_matching_results = []
-        for r in self.lst_sorted_results:
-            if r[0] == var_search_username:
-                lst_matching_results.append(r)
-
-        matching_results = ""
-        for r in lst_matching_results:
-            matching_results += self.fnc_r_lst_to_txt(r)
-        if matching_results:
-            self.lbl_r_text.configure(text=matching_results)
-        else:  # Display message if no results
-            self.lbl_r_text.configure(
-                text="There are no results with this username.")
-
-    def fnc_r_lst_to_txt(self, input):
-        txt = "{} | {:.1f}% ({} Correct / {} Incorrect)\n".format(input[0],
-                                                                  input[3],
-                                                                  input[1],
-                                                                  input[2])
-        return txt
 
 
 # Main Routine
