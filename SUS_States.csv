@@ -1,51 +1,51 @@
-﻿Alabama,7,7
-Alaska,8,1
-Arizona,6,2
-Arkansas,6,5
-California,5,1
-Colorado,5,3
-Connecticut,4,10
-Delaware,5,11
-D.C.,5,9
-Florida,8,8
-Georgia,7,8
-Hawaii,8,2
-Idaho,3,2
-Illinois,3,6
-Indiana,4,6
-Iowa,4,5
-Kansas,6,4
-Kentucky,5,6
-Louisiana,7,5
-Maine,2,12
-Maryland,5,10
-Massachusetts,3,11
-Michigan,3,7
-Minnesota,3,5
-Mississippi,7,6
-Missouri,5,5
-Montana,3,3
-Nebraska,5,4
-Nevada,4,2
-New Hampshire,2,11
-New Jersey,4,9
-New Mexico,6,3
-New York,3,9
-North Carolina,6,7
-North Dakota,3,4
-Ohio,4,7
-Oklahoma,7,4
-Oregon,4,1
-Pennsylvania,4,8
-Rhode Island,4,11
-South Carolina,6,8
-South Dakota,4,4
-Tennessee,6,6
-Texas,8,4
-Utah,5,2
-Vermont,3,10
-Virginia,5,8
-Washington,3,1
-West Virginia,5,7
-Wisconsin,2,6
-Wyoming,4,3
+﻿Alabama,7,7,Montgomery
+Alaska,8,1,Juneau
+Arizona,6,2,Phoenix
+Arkansas,6,5,Little Rock
+California,5,1,Sacramento
+Colorado,5,3,Denver
+Connecticut,4,10,Hartford
+Delaware,5,11,Dover
+D.C.,5,9,Washington D.C.
+Florida,8,8,Tallahassee
+Georgia,7,8,Atlanta
+Hawaii,8,2,Honolulu
+Idaho,3,2,Boise
+Illinois,3,6,Springfield
+Indiana,4,6,Indianapolis
+Iowa,4,5,Des Moines
+Kansas,6,4,Topeka
+Kentucky,5,6,Frankfort
+Louisiana,7,5,Baton Rouge
+Maine,2,12,Augusta
+Maryland,5,10,Annapolis
+Massachusetts,3,11,Boston
+Michigan,3,7,Lansing
+Minnesota,3,5,Saint Paul
+Mississippi,7,6,Jackson
+Missouri,5,5,Jefferson City
+Montana,3,3,Helena
+Nebraska,5,4,Lincoln
+Nevada,4,2,Carson City
+New Hampshire,2,11,Concord
+New Jersey,4,9,Trenton
+New Mexico,6,3,Santa Fe
+New York,3,9,Albany
+North Carolina,6,7,Raleigh
+North Dakota,3,4,Bismarck
+Ohio,4,7,Columbus
+Oklahoma,7,4,Oklahoma City
+Oregon,4,1,Salem
+Pennsylvania,4,8,Harrisburg
+Rhode Island,4,11,Providence
+South Carolina,6,8,Columbia
+South Dakota,4,4,Pierre
+Tennessee,6,6,Nashville
+Texas,8,4,Austin
+Utah,5,2,Salt Lake City
+Vermont,3,10,Montpelier
+Virginia,5,8,Richmond,
+Washington,3,1,Olympia
+West Virginia,5,7,Charleston
+Wisconsin,2,6,Madison
+Wyoming,4,3,Cheyenne

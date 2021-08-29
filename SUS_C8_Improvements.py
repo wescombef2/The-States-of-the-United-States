@@ -1,8 +1,11 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 1.5 – Added Logo as Window Icon, Added Logo to Heading for Message
-Boxes and Past Results Windows.
+Version 2.0 – Added state capitals to states csv. Added questions around which
+state has the given capital. Fixed bug where states correctly selected do not
+have text removed. Added date to results saving. Fixed errors occurring when in
+past results window when there are less than five saved results, and added
+message when there are none.
 25/08/21
 """
 
@@ -65,8 +68,8 @@ class Menu:
         self.lbl_m_options.grid(row=0)
 
         # Combo Box (Row 1 / Row 0, Column 1 / Row 1)
-        self.lst_quiz_options = ["3 (Trial)", "10 (Short)", "20 (Long)",
-                                 "51 (Complete)"]
+        self.lst_quiz_options = ["3 Questions (Random)", "10 Questions (States)", "10 Questions (Capitals)",
+                                 "20 Questions (Random)"]
         self.ent_m_questions = ttk.Combobox(self.frm_m_options)
         self.ent_m_questions['values'] = self.lst_quiz_options
         self.ent_m_questions['state'] = 'readonly'  # normal
@@ -90,8 +93,8 @@ class Menu:
 
     def fnc_get_g(self):
         try:
-            q_count = self.ent_m_questions.get()
-            g = Game(self, q_count)
+            q_opt = self.ent_m_questions.get()
+            g = Game(self, q_opt)
         except ValueError:
             self.ent_m_questions.set('Required')
 
@@ -225,10 +228,11 @@ class Results:
             filereader = csv.reader(csvfile, delimiter=',')
             lst_results = []
             for line in filereader:
-                percentage = (int(line[1]) / (
-                        int(line[1]) + int(line[2]))) * 100
-                lst_results.append([line[0], int(line[1]), int(line[2]),
-                                    percentage])  # Create list of items from csv
+                if line:
+                    percentage = (int(line[1]) / (
+                            int(line[1]) + int(line[2]))) * 100
+                    lst_results.append([line[0], int(line[1]), int(line[2]),
+                                        percentage, line[3]])  # Create list of items from csv
         # Sort list results by percentage
         self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
                                          reverse=True)
@@ -333,6 +337,14 @@ class Results:
                                 padx=10, pady=10)
         self.lbl_result_text.grid(row=0, column=1)
 
+        # Date Text (Row 3 / Column 2)
+        self.lbl_date_text = Label(self.frm_username,
+                                text="",
+                                font=("Arial", "12"),
+                                bg="white",
+                                padx=10, pady=10)
+        self.lbl_date_text.grid(row=0, column=2)
+
         # Footer Frame (Row 3)
         self.frm_r_footer = Frame(self.frm_r, width=100, height=20,
                                   bg=bg_colour)
@@ -347,14 +359,27 @@ class Results:
         self.btn_r_close.grid(row=0)
 
         # Configure Results Text
+        # Check if results
         usernames = ""
         results = ""
-        for i in range(0, 5):
-            lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
-            usernames += lst[0]
-            results += lst[1]
-        self.lbl_username_text.configure(text=usernames)
-        self.lbl_result_text.configure(text=results)
+        dates = ""
+        if len(self.lst_sorted_results) >= 5:
+            for i in range(0, 5):
+                lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
+                usernames += lst[0]
+                results += lst[1]
+                dates += lst[2]
+            self.fnc_r_configure_text(usernames, results, dates)
+        elif len(self.lst_sorted_results) == 0:
+            self.lbl_search_heading.configure(text="There are no saved results",
+                                              bg="dark blue")
+        else:
+            for i in range(0, len(self.lst_sorted_results)):
+                lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
+                usernames += lst[0]
+                results += lst[1]
+                dates += lst[2]
+            self.fnc_r_configure_text(usernames, results, dates)
 
     def fnc_r_search_results(self):
         # Get search username
@@ -367,27 +392,33 @@ class Results:
 
         usernames = ""
         results = ""
+        dates = ""
         for r in lst_matching_results:
             lst = self.fnc_r_lst_to_txt(r)
             usernames += lst[0]
             results += lst[1]
+            dates += lst[2]
         if usernames:
-            self.lbl_username_text.configure(text=usernames)
-            self.lbl_result_text.configure(text=results)
+            self.fnc_r_configure_text(usernames, results, dates)
             self.lbl_search_heading.configure(text="Search Results for '{}'".
                                               format(var_search_username),
                                               bg="dark blue")
         else:  # Display message if no results
-            self.lbl_username_text.configure(text="")
-            self.lbl_result_text.configure(text="")
+            self.fnc_r_configure_text("", "", "")
             self.lbl_search_heading.configure(
                 text="There are no results matching '{}'".
                     format(var_search_username), bg="red")
 
+    def fnc_r_configure_text(self, usernames, results, date):
+        self.lbl_username_text.configure(text=usernames)
+        self.lbl_result_text.configure(text=results)
+        self.lbl_date_text.configure(text=date)
+
     def fnc_r_lst_to_txt(self, input):
         txt_username = "{}\n".format(input[0])
         txt_result = "[ {:.1f}% ({}/{}) ]\n".format(input[3], input[1], (input[1]+input[2]))
-        return txt_username, txt_result
+        txt_dates = "{}\n".format(input[4])
+        return txt_username, txt_result, txt_dates
 
     def fnc_r_close(self, menu):
         # Re-enable Help Button
@@ -405,8 +436,11 @@ class Game:
 
         # Define Formatting Variables
         bg_colour = "white"
+
+        # Get the Quiz Option
         q_opt_split = q_opt.split(" ")
         self.q_count = int(q_opt_split[0])
+        self.q_type = q_opt_split[2]
         self.menu = menu
         # Disable Button in Menu
         menu.btn_m_game.configure(state=DISABLED)
@@ -489,11 +523,10 @@ class Game:
             filereader = csv.reader(csvfile, delimiter=',')
             lst_state_csv = []
             for line in filereader:
-                lst_state_csv.append([line[0], [line[1], line[
-                    2]]])  # Create list of items from csv
+                lst_state_csv.append([line[0], line[3], [line[1], line[2]]])  # Create list of items from csv
         for i in lst_state_csv:  # for each row in csv
-            state = State(frame, game_function, i[0], i[1][0],
-                          i[1][1])  # Create state object
+            state = State(frame, game_function, i[0], i[1], i[2][0],
+                          i[2][1])  # Create state object
             if game_function:
                 self.lst_state_objects.append(
                     state)  # only edit list if game function
@@ -501,6 +534,11 @@ class Game:
     # Generate Question Function
     def fnc_generate_question(self):
         import random
+
+        # Return All States to White and no Name, Enabled
+        for obj in self.lst_state_objects:
+            obj.btn_state.configure(text="", bg="white",
+                                    state=NORMAL)
 
         # Disable Header Button
         self.btn_header.configure(state=DISABLED)
@@ -510,21 +548,29 @@ class Game:
         # Counting Variable to Record Attempts
         self.var_current_attempts = 0
 
-        # Create Question Label (Row 1 / Row 0 / Row 1)
+        # Randomly Select a State Object
         self.obj_selected_state = self.lst_state_objects[
             random.randint(0, len(self.lst_state_objects) - 1)]
-        self.lbl_header.configure(
+
+        # Check Quiz Type
+        lst_q_types = ["(Random)", "(States)", "(Capitals)"]
+        current_q_type = 0
+        if self.q_type == lst_q_types[0]:
+            # If random, select random current question type
+            current_q_type = random.randint(1,2)
+        if self.q_type == lst_q_types[1] or current_q_type == 1:
+            self.lbl_header.configure(
             text="Which State is {}?".format(self.obj_selected_state.name),
             bg="dark blue")
+        else:
+            self.lbl_header.configure(
+            text="{} is the Capital of which State?".format(self.obj_selected_state.capital),
+            bg="dark blue")
+
         # Add Newly Selected State to Selected List
         self.lst_selected_states.append(self.obj_selected_state)
         # Increase Current Selection Index
         self.var_selection_index += 1
-
-        # Return All States to White and no Name, Enabled
-        for obj in self.lst_state_objects:
-            obj.btn_state.configure(bg="white",
-                                    state=NORMAL)
 
     # Generate Internal Results Functions
     def fnc_internal_results(self, result_text, lbl_colour):
@@ -546,7 +592,7 @@ class Game:
     def fnc_external_results(self):
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text=obj.name, bg="white",
+            obj.btn_state.configure(text="", bg="white",
                                     state=NORMAL)
 
         # Configure Header Label
@@ -591,8 +637,11 @@ class Game:
 
     # Save Results Function
     def fnc_save_results(self):
+        from datetime import date
         # Get Username
         self.username = self.ent_username.get()
+        # Get Today's Date
+        self.today = date.today()
         # Check if Username
         if not self.username:  # If not
             self.ent_username.configure(fg="red")
@@ -600,7 +649,7 @@ class Game:
             self.ent_username.bind("<FocusIn>", lambda args: self.ent_username.delete('0', 'end'))  # Emphasize entry box
             return  # End Function
         # Create list for storing Username and Tally
-        self.append_row = [self.username, self.lst_tally[0], self.lst_tally[1]]
+        self.append_row = [self.username, self.lst_tally[0], self.lst_tally[1], self.today]
         # Write to a csv file
         from csv import writer
         # open the file in the append mode
@@ -621,8 +670,9 @@ class Game:
 
     # Display Save Success Message
     def fnc_get_save_message(self):
-        message_text = "Saved: {} ({} Correct /{} Incorrect)". \
-            format(self.username, self.lst_tally[0], self.lst_tally[1])
+        message_text = "Results Saved: \n" \
+                       "{} ({} Correct /{} Incorrect), {}". \
+            format(self.username, self.lst_tally[0], self.lst_tally[1], self.today)
         mb = Message_Box("Save Successful", message_text, "", "")
 
     # Close Window Function
@@ -636,10 +686,11 @@ class Game:
 # State Class
 class State:
 
-    def __init__(self, window, game_function, name, row, column):
-        # Define Format Variables
+    def __init__(self, window, game_function, name, capital, row, column):
 
+        # Define Variables to be accessed for questions
         self.name = name
+        self.capital = capital
 
         # State Button
         self.btn_state = Button(window.frm_cartogram,
