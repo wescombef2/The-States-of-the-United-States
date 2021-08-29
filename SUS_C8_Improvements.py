@@ -1,16 +1,17 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 1.4 – Overhauled Past Results GUI display, added watermark ‘Required’
-for menu question options combo-box.
+Version 1.5 – Added Logo as Window Icon, Added Logo to Heading for Message
+Boxes and Past Results Windows.
 25/08/21
 """
 
 # Import Tools
 from tkinter import *  # For GUI Display
 from tkinter import ttk  # For Combobox
+import tkinter as tk  # For GUI
 from functools import partial  # To Prevent Unwanted Windows
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk  # For Logo Image (to resize)
 
 
 # Menu GUI Class
@@ -129,22 +130,37 @@ class Message_Box:
 
         # Create Window
         self.box_mb = Toplevel()
-
         self.box_mb.protocol('WM_DELETE_WINDOW', self.fnc_mb_close)
-
+        self.box_mb.iconbitmap('SUS_Logo.ico')
         # Main Frame
         self.frm_mb = Frame(self.box_mb, width=30, height=30, bg=bg_colour)
         self.frm_mb.grid()
 
+        # Heading Frame
+        self.frm_header = Frame(self.frm_mb, width=30, height=30, bg=bg_colour)
+        self.frm_header.grid(row=0)
+
+        # Logo and Heading (Row 0, Column 0)
+        self.img_logo = Image.open("SUS_Logo.gif")  # Open Image
+        self.img_logo = self.img_logo.resize((120, 80),
+                                             Image.ANTIALIAS)  # Resize image
+        self.img_logo = ImageTk.PhotoImage(self.img_logo)  # Make PhotoImage
+        # Use Heading Label for Image
+        self.lbl_image = Label(self.frm_header,
+                                   image=self.img_logo,
+                                   bg=bg_colour,
+                                   padx=10, pady=5)
+        self.lbl_image.grid(row=0, column=0)
+
         # Heading (Row 0)
-        self.lbl_mb_heading = Label(self.frm_mb,
+        self.lbl_mb_heading = Label(self.frm_header,
                                     text=heading,
                                     font=("Arial", "16", "bold"),
                                     bg="dark blue",
                                     fg="white",
-                                    width=30,
+                                    width=20,
                                     padx=10, pady=5)
-        self.lbl_mb_heading.grid(row=0)
+        self.lbl_mb_heading.grid(row=0, column=1)
 
         # Text (Row 1)
         self.lbl_mb_text = Label(self.frm_mb,
@@ -221,20 +237,36 @@ class Results:
         self.box_r = Toplevel()
         self.box_r.protocol('WM_DELETE_WINDOW',
                             partial(self.fnc_r_close, menu))
-
+        self.box_r.iconbitmap('SUS_Logo.ico')
         # Main Frame
         self.frm_r = Frame(self.box_r, width=100, height=100, bg=bg_colour)
         self.frm_r.grid()
 
+        # Heading Frame
+        self.frm_header = Frame(self.frm_r, width=30, height=30, bg=bg_colour)
+        self.frm_header.grid(row=0)
+
+        # Logo and Heading (Row 0, Column 0)
+        self.img_logo = Image.open("SUS_Logo.gif")  # Open Image
+        self.img_logo = self.img_logo.resize((120, 80),
+                                             Image.ANTIALIAS)  # Resize image
+        self.img_logo = ImageTk.PhotoImage(self.img_logo)  # Make PhotoImage
+        # Use Heading Label for Image
+        self.lbl_image = Label(self.frm_header,
+                                   image=self.img_logo,
+                                   bg=bg_colour,
+                                   padx=10, pady=5)
+        self.lbl_image.grid(row=0, column=0)
+
         # Heading (Row 0)
-        self.lbl_r_heading = Label(self.frm_r,
+        self.lbl_r_heading = Label(self.frm_header,
                                    text="Past Results",
                                    font=("Arial", "16", "bold"),
                                    bg="dark blue",
                                    fg="white",
-                                   width=30,
+                                   width=20,
                                    padx=10, pady=5)
-        self.lbl_r_heading.grid(row=0)
+        self.lbl_r_heading.grid(row=0, column=1)
 
         # Searching Frame (Row 1)
         self.frm_r_search = Frame(self.frm_r, width=100, height=50,
@@ -384,7 +416,7 @@ class Game:
         # Create Window
         self.box_g = Toplevel()
         self.box_g.protocol('WM_DELETE_WINDOW', self.fnc_g_close)
-
+        self.box_g.iconbitmap('SUS_Logo.ico')
         # Main Frame
         self.frm_g = Frame(self.box_g, width=100, height=100, bg=bg_colour)
         self.frm_g.grid()
@@ -398,7 +430,7 @@ class Game:
         self.lbl_header = Label(self.frm_header, text="",
                                 font=("Arial", "16", "bold"),
                                 bg="dark blue", fg="white",
-                                width=60, padx=30, pady=5)
+                                width=65, padx=30, pady=5)
         self.lbl_header.grid(row=0)
 
         # Header Widget Frame (for results)
@@ -491,7 +523,7 @@ class Game:
 
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text="", bg="white",
+            obj.btn_state.configure(bg="white",
                                     state=NORMAL)
 
     # Generate Internal Results Functions
@@ -514,7 +546,7 @@ class Game:
     def fnc_external_results(self):
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text="", bg="white",
+            obj.btn_state.configure(text=obj.name, bg="white",
                                     state=NORMAL)
 
         # Configure Header Label
@@ -613,8 +645,8 @@ class State:
         self.btn_state = Button(window.frm_cartogram,
                                 text=self.name,
                                 fg="white",
-                                font=("Arial", "9", "bold"),
-                                width=8, height=4,
+                                font=("Arial", "6", "bold"),
+                                width=12, height=6,
                                 borderwidth=4,
                                 relief="sunken",
                                 state=NORMAL)
@@ -657,71 +689,11 @@ class State:
                     self.obj_game.fnc_internal_results("Incorrect", "red")
 
 
-# Cartogram GUI Class
-class Cartogram:
-    # Initialize Function
-    def __init__(self, game):
-        # Define Formatting Variables
-        bg_colour = "white"
-
-        # Disable Button in Menu
-        game.btn_g_cartogram.configure(state=DISABLED)
-
-        # Create Window
-        self.box_c = Toplevel()
-        self.box_c.protocol('WM_DELETE_WINDOW',
-                            partial(self.fnc_c_close, game))
-
-        # Main Frame
-        self.frm_c = Frame(self.box_c, width=100, height=100, bg=bg_colour)
-        self.frm_c.grid()
-
-        # Heading (Row 0)
-        self.lbl_c_heading = Label(self.frm_c,
-                                   text="Cartogram",
-                                   font=("Arial", "16", "bold"),
-                                   bg="dark blue",
-                                   fg="white",
-                                   width=100,
-                                   padx=10, pady=5)
-        self.lbl_c_heading.grid(row=0)
-
-        # Cartogram Frame (Row 1)
-        self.frm_cartogram = Frame(self.frm_c, width=100, height=100,
-                                   bg=bg_colour)
-        self.frm_cartogram.grid(row=1)
-
-        # Footer Frame (Row 2)
-        self.frm_c_footer = Frame(self.frm_c, width=100, height=20,
-                                  bg=bg_colour)
-        self.frm_c_footer.grid(row=2)
-
-        # So that Width and Height is Measured in Pixels, Create 1x1 Image
-        pixel_image = PhotoImage(width=1, height=1)
-
-        # Close Button (Row 2 / Row 0)
-        self.btn_c_close = Button(self.frm_c_footer,
-                                  text="Close",
-                                  width=10, height=2,
-                                  padx=1, pady=1,
-                                  command=partial(self.fnc_c_close, game))
-        self.btn_c_close.grid(row=0)
-
-        # Generate Cartogram
-        game.fnc_generate_cartogram(self, False)
-
-    # Close Window Function
-    def fnc_c_close(self, game):
-        # Re-enable Help Button
-        game.btn_g_cartogram.configure(state=NORMAL)
-        # Close Window
-        self.box_c.destroy()
-
-
 # Main Routine
 
 if __name__ == "__main__":
     root = Tk()
     root.title("The States of the United States")
+    root.iconbitmap('SUS_Logo.ico')
     main_window = Menu()
     root.mainloop()
