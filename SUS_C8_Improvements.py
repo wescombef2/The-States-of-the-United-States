@@ -1,11 +1,9 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 2.0 – Added state capitals to states csv. Added questions around which
-state has the given capital. Fixed bug where states correctly selected do not
-have text removed. Added date to results saving. Fixed errors occurring when in
-past results window when there are less than five saved results, and added
-message when there are none.
+Version 2.1 - Fixed bug where the save successful message box is not in front
+of the menu window. All cartogram displays all names in external results for
+reference.
 25/08/21
 """
 
@@ -122,12 +120,6 @@ class Message_Box:
     # Initialize Function
     def __init__(self, heading, text, footer_text, partner_button):
 
-        # For Disable/Reenable Buttons
-        if partner_button:
-            self.partner_button = partner_button
-            self.partner_button.configure(state=DISABLED)
-        else:
-            self.partner_button = ""
         # Define Formatting Variables
         bg_colour = "white"
 
@@ -135,6 +127,14 @@ class Message_Box:
         self.box_mb = Toplevel()
         self.box_mb.protocol('WM_DELETE_WINDOW', self.fnc_mb_close)
         self.box_mb.iconbitmap('SUS_Logo.ico')
+
+        # For Disable/Reenable Buttons
+        if partner_button:
+            self.partner_button = partner_button
+            self.partner_button.configure(state=DISABLED)
+        else:
+            self.partner_button = ""
+
         # Main Frame
         self.frm_mb = Frame(self.box_mb, width=30, height=30, bg=bg_colour)
         self.frm_mb.grid()
@@ -592,7 +592,7 @@ class Game:
     def fnc_external_results(self):
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
-            obj.btn_state.configure(text="", bg="white",
+            obj.btn_state.configure(text=obj.name, bg="white", fg="black",
                                     state=NORMAL)
 
         # Configure Header Label
@@ -664,9 +664,10 @@ class Game:
             # Close the file object
             f_object.close()
 
-        self.fnc_get_save_message()
         # Destroy game window
         self.fnc_g_close()
+
+        self.fnc_get_save_message()
 
     # Display Save Success Message
     def fnc_get_save_message(self):
