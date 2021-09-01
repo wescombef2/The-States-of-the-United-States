@@ -1,9 +1,7 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 2.2 – Updated instructions to match the new game systems, swapped menu
-instructions and result button locations, added question number/remaining
-tracking in game.
+Version 2.3 – Added question tracking for state capital questions.
 25/08/21
 """
 
@@ -567,7 +565,7 @@ class Game:
             bg="dark blue")
         else:
             self.lbl_header.configure(
-            text="{} is the Capital of which State?".format(self.obj_selected_state.capital),
+            text="Question {} of {}: {} is the Capital of which State?".format(self.q_count-self.q_remaining, self.q_count, self.obj_selected_state.capital),
             bg="dark blue")
 
         # Add Newly Selected State to Selected List
