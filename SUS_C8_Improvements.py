@@ -1,9 +1,9 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 2.1 - Fixed bug where the save successful message box is not in front
-of the menu window. All cartogram displays all names in external results for
-reference.
+Version 2.2 – Updated instructions to match the new game systems, swapped menu
+instructions and result button locations, added question number/remaining
+tracking in game.
 25/08/21
 """
 
@@ -73,21 +73,23 @@ class Menu:
         self.ent_m_questions['state'] = 'readonly'  # normal
         self.ent_m_questions.grid(row=1)
 
-        # Instructions Button (Row 1 / Row 2)
-        self.btn_m_instructions = Button(self.frm_m_widgets,
-                                         text="Instructions",
-                                         width=15, height=2,
-                                         padx=1, pady=1,
-                                         command=self.fnc_get_i)
-        self.btn_m_instructions.grid(row=2)
-
-        # View Past Results Button (Row 1 / Row 3)
+        # View Past Results Button (Row 1 / Row 2)
         self.btn_m_results = Button(self.frm_m_widgets,
                                     text="View Past Results",
                                     width=15, height=2,
                                     padx=1, pady=1,
                                     command=self.fnc_get_r)
-        self.btn_m_results.grid(row=3)
+        self.btn_m_results.grid(row=2)
+
+        # Instructions Button (Row 1 / Row 3)
+        self.btn_m_instructions = Button(self.frm_m_widgets,
+                                         text="Instructions",
+                                         width=15, height=2,
+                                         padx=1, pady=1,
+                                         command=self.fnc_get_i)
+        self.btn_m_instructions.grid(row=3)
+
+
 
     def fnc_get_g(self):
         try:
@@ -98,15 +100,13 @@ class Menu:
 
     def fnc_get_i(self):
         instruction_text = "The States of the United States is a memory-based\n" \
-                           "quiz around the locations of the states in a box\n" \
-                           "cartographic form. To begin the game, select the quiz\n" \
-                           "type and press 'Play' play in the menu. The game will\n" \
-                           "provide a blank cartogram and a question; to answer,\n" \
-                           "you must press the correct state within three tries.\n" \
-                           "When you have answered all questions, whether correct\n" \
-                           "or incorrect, the game will end and you will have the\n" \
-                           "chance to save your results with a username before\n" \
-                           "you return to the menu. This is optional. "
+                           "quiz around the locations of states in a box cartogram,\n" \
+                           "given the name of the state or, once the states have\n" \
+                           "been memorized, the state's capital. You are given three\n" \
+                           "guesses before failing each question. Once you have\n" \
+                           "completed the quiz, you will be able to see a reference\n" \
+                           "cartogram and given the option save your results with a\n" \
+                           "username. You can find saved results from the menu.\n"
         i = Message_Box("Instructions", instruction_text, "",
                         self.btn_m_instructions)
         i.lbl_mb_text.configure(height=10, anchor=N)
@@ -440,6 +440,7 @@ class Game:
         # Get the Quiz Option
         q_opt_split = q_opt.split(" ")
         self.q_count = int(q_opt_split[0])
+        self.q_remaining = self.q_count
         self.q_type = q_opt_split[2]
         self.menu = menu
         # Disable Button in Menu
@@ -535,6 +536,8 @@ class Game:
     def fnc_generate_question(self):
         import random
 
+        self.q_remaining -= 1
+
         # Return All States to White and no Name, Enabled
         for obj in self.lst_state_objects:
             obj.btn_state.configure(text="", bg="white",
@@ -560,7 +563,7 @@ class Game:
             current_q_type = random.randint(1,2)
         if self.q_type == lst_q_types[1] or current_q_type == 1:
             self.lbl_header.configure(
-            text="Which State is {}?".format(self.obj_selected_state.name),
+            text="Question {} of {}: Which State is {}?".format(self.q_count-self.q_remaining, self.q_count, self.obj_selected_state.name),
             bg="dark blue")
         else:
             self.lbl_header.configure(
@@ -583,7 +586,7 @@ class Game:
         self.lbl_header.configure(text=text, bg=lbl_colour)
 
         # Check if Game is Over
-        if self.q_count <= 0:  # if so
+        if self.q_remaining <= 0:  # if so
             # Configure Header Button for Generating External Results
             self.btn_header.configure(text="Complete",
                                       command=self.fnc_external_results)
@@ -721,7 +724,6 @@ class State:
                                          bg="dark blue")
                 # Change Game Variables Accordingly
                 self.obj_game.var_current_question = False  # No current question
-                self.obj_game.q_count -= 1  # Question complete, fewer remaining
                 self.obj_game.lst_tally[0] += 1  # Add one to correct tally
                 # Generate Internal Results
                 self.obj_game.fnc_internal_results("Correct", "dark blue")
@@ -736,7 +738,6 @@ class State:
                     self.obj_game.var_current_question = False
                     self.obj_game.lst_tally[
                         1] += 1  # Add one to incorrect tally
-                    self.obj_game.q_count -= 1  # Question complete, fewer remaining
                     # Generate Internal Results
                     self.obj_game.fnc_internal_results("Incorrect", "red")
 
