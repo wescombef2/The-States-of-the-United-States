@@ -1,9 +1,7 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 3.1 – View past results button shifted from menu to successful save
-message screen. Instruction text has been changed to be clearer and more
-concise. Added number reference for leaderboard status.
+Version 3.2 – Ensure code meets PEP8 formatting requirements.
 25/08/21
 """
 
@@ -109,20 +107,20 @@ class Menu:
             self.ent_m_questions.set('Required')
 
     def fnc_get_i(self):
-        instruction_text = "The States of the United States of America Quiz:\n" \
-                           "\n" \
-                           " + There are three quiz types, 'States' (in which\n" \
-                           "you select the location of a state given its name),\n" \
-                           "'Capitals' (in which you are given the capital of\n" \
-                           "the state), and 'Random' (where the two question \n" \
-                           " types alternate randomly).\n" \
-                           "\n" \
-                           " + You are given three tries for each question. \n" \
-                           "\n" \
-                           " + Upon ending the quiz, you can save your results\n" \
-                           "optionally. If so, you can view other saved results\n" \
-                           "and check your place on the leaderboard."
-        i = Instruction_or_Message("Instructions", instruction_text, False,
+        i_text = "The States of the United States of America Quiz:\n" \
+                 "\n" \
+                 " + There are three quiz types, 'States' (in which\n" \
+                 "you select the location of a state given its name),\n" \
+                 "'Capitals' (in which you are given the capital of\n" \
+                 "the state), and 'Random' (where the two question \n" \
+                 " types alternate randomly).\n" \
+                 "\n" \
+                 " + You are given three tries for each question. \n" \
+                 "\n" \
+                 " + Upon ending the quiz, you can save your results\n" \
+                 "optionally. If so, you can view other saved results\n" \
+                 "and check your place on the leaderboard."
+        i = Instruction_or_Message("Instructions", i_text, False,
                                    self.btn_m_instructions)
         i.lbl_mb_text.configure(width=50, height=15, anchor='n', justify=LEFT)
 
@@ -395,14 +393,14 @@ class Results:
                             int(line[1]) + int(line[2]))) * 100
                     lst_results.append([line[0], int(line[1]), int(line[2]),
                                         percentage, line[
-                                            3]])  # Create list of items from csv
+                                            3]])  # list of items from csv
         # Sort list results by percentage
         self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
                                          reverse=True)
         # Add index to each for displayed leaderboard placement.
-        index = 0 # Index variable
+        index = 0  # Index variable
         for r in self.lst_sorted_results:
-            index += 1 # Add to index first so no '0' index
+            index += 1  # Add to index first so no '0' index
             r.append(index)
 
     def fnc_r_get_leaderboard(self):
@@ -462,8 +460,8 @@ class Results:
         else:  # Display message if no results
             self.fnc_r_configure_text("", "", "")
             self.lbl_search_heading.configure(
-                text="There are no results matching '{}'".
-                    format(var_search_username), bg="red")
+                text="There are no results matching '{}'".format(
+                    var_search_username), bg="red")
 
     def fnc_r_configure_text(self, usernames, results, date):
         self.lbl_username_text.configure(text=usernames)
@@ -571,11 +569,12 @@ class Game:
         # Generate Cartogram
         self.fnc_generate_cartogram(self, True)
 
-        # Create List for Storing Selected State Objects along with other Variables
+        # Create List for Storing Selected State Objects along with Variables
         self.lst_selected_states = [
             ""]  # Placeholder Item so that 0 is not an Index.
         self.var_selection_index = 0  # To save index of selected item
-        self.var_current_question = False  # Boolean to determine whether there is a current question
+        self.var_current_question = False  # Boolean to determine whether there
+        # is a current question
         self.lst_tally = [0, 0]  # Saves results (correct/incorrect)
 
         # Generate Question
@@ -588,7 +587,8 @@ class Game:
 
         # Create Blank List in Which States are Stored (Only if for new game)
         if game_function:
-            self.lst_state_objects = []  # Only edits list if game function, otherwise it interferes with the current game
+            self.lst_state_objects = []  # Only edits list if game function,
+            # otherwise it interferes with the current game
         # 8 Rows, 11 Columns
         with open('SUS_States.csv', newline='',
                   encoding='utf-8-sig') as csvfile:  # Open .csv file
@@ -645,9 +645,10 @@ class Game:
                 bg="dark blue")
         else:
             self.lbl_header.configure(
-                text="Question {} of {}: {} is the Capital of which State?".format(
-                    self.q_count - self.q_remaining, self.q_count,
-                    self.obj_selected_state.capital),
+                text="Question {} of {}: {} is the Capital of which "
+                     "State?".format(self.q_count - self.q_remaining,
+                                     self.q_count,
+                                     self.obj_selected_state.capital),
                 bg="dark blue")
 
         # Add Newly Selected State to Selected List
@@ -725,8 +726,10 @@ class Game:
             self.ent_username.configure(fg="red")
             self.ent_username.insert(0, 'Required')
             self.ent_username.bind("<FocusIn>",
-                                   lambda args: self.ent_username.delete('0',
-                                                                         'end'))  # Emphasize entry box
+                                   lambda args:
+                                   # Emphasize entry box
+                                   self.ent_username.delete('0', 'end'))
+
             return  # End Function
         # Create list for storing Username and Tally
         self.append_row = [self.username, self.lst_tally[0], self.lst_tally[1],
@@ -801,22 +804,26 @@ class State:
         # Check if current question (otherwise nothing happens)
         if self.obj_game.var_current_question:
             # Check if Correct State for Current Question
-            if self.obj_game.obj_selected_state.name == self.name:  # If correct
+            if self.obj_game.obj_selected_state.name == self.name:
                 # Configure State Button Accordingly
                 self.btn_state.configure(text=self.text,
                                          bg="dark blue")
                 # Change Game Variables Accordingly
-                self.obj_game.var_current_question = False  # No current question
+                self.obj_game.var_current_question = False  # No current
+                # question
                 self.obj_game.lst_tally[0] += 1  # Add one to correct tally
                 # Generate Internal Results
                 self.obj_game.fnc_internal_results("Correct", "dark blue")
 
             else:  # If Incorrect
                 self.btn_state.configure(text=self.text, bg="red",
-                                         state=DISABLED)  # Make State red and disabled
+                                         state=DISABLED)  # Make State red and
+                # disabled
 
-                self.obj_game.var_current_attempts += 1  # Increase attempt count
-                if self.obj_game.var_current_attempts >= 3:  # Check if third attempt, if so
+                self.obj_game.var_current_attempts += 1  # Increase attempt
+                # count
+                if self.obj_game.var_current_attempts >= 3:  # Check if third
+                    # attempt, if so
                     # Change Game Variables Accordingly
                     self.obj_game.var_current_question = False
                     self.obj_game.lst_tally[
