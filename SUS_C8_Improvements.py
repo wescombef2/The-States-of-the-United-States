@@ -1,13 +1,9 @@
 """
 The States of the United States
 Component 08 - Improvements
-Version 3.0 – Added highlighting of correct answer after failing a question,
-selected states now show state text with disabled foreground colour being white
-to improve readability on incorrect selections along with larger font size,
-shifted Alaska state to the top left of the cartogram, prevented repeated
-questions, changed leaderboard to top 10. Had windows be in full screen mode
-and resized items to compensate, added exit button in menu and in game, as
-window closure is no longer possible.
+Version 3.1 – View past results button shifted from menu to successful save
+message screen. Instruction text has been changed to be clearer and more
+concise. Added number reference for leaderboard status.
 25/08/21
 """
 
@@ -81,19 +77,11 @@ class Menu:
                                  "10 Questions (States)",
                                  "10 Questions (Capitals)",
                                  "20 Questions (Random)"]
-        self.ent_m_questions = ttk.Combobox(self.frm_m_options, width=20, font=("Arial", "14"))
+        self.ent_m_questions = ttk.Combobox(self.frm_m_options, width=20,
+                                            font=("Arial", "14"))
         self.ent_m_questions['values'] = self.lst_quiz_options
         self.ent_m_questions['state'] = 'readonly'  # normal
         self.ent_m_questions.grid(row=1)
-
-        # View Past Results Button (Row 1 / Row 2)
-        self.btn_m_results = Button(self.frm_m_widgets,
-                                    text="View Past Results",
-                                    font=("Arial", "16", "bold"),
-                                    width=20, height=2,
-                                    padx=1, pady=1,
-                                    command=self.fnc_get_r)
-        self.btn_m_results.grid(row=2)
 
         # Instructions Button (Row 1 / Row 3)
         self.btn_m_instructions = Button(self.frm_m_widgets,
@@ -121,29 +109,31 @@ class Menu:
             self.ent_m_questions.set('Required')
 
     def fnc_get_i(self):
-        instruction_text = "The States of the United States is a memory-based\n" \
-                           "quiz around the locations of states in a box cartogram,\n" \
-                           "given the name of the state or, once the states have\n" \
-                           "been memorized, the state's capital. You are given three\n" \
-                           "guesses before failing each question. Once you have\n" \
-                           "completed the quiz, you will be able to see a reference\n" \
-                           "cartogram and given the option save your results with a\n" \
-                           "username. You can find saved results from the menu.\n"
-        i = Message_Box("Instructions", instruction_text, "",
-                        self.btn_m_instructions)
-        i.lbl_mb_text.configure(height=10, anchor=N)
-
-    def fnc_get_r(self):
-        r = Results(self)
+        instruction_text = "The States of the United States of America Quiz:\n" \
+                           "\n" \
+                           " + There are three quiz types, 'States' (in which\n" \
+                           "you select the location of a state given its name),\n" \
+                           "'Capitals' (in which you are given the capital of\n" \
+                           "the state), and 'Random' (where the two question \n" \
+                           " types alternate randomly).\n" \
+                           "\n" \
+                           " + You are given three tries for each question. \n" \
+                           "\n" \
+                           " + Upon ending the quiz, you can save your results\n" \
+                           "optionally. If so, you can view other saved results\n" \
+                           "and check your place on the leaderboard."
+        i = Instruction_or_Message("Instructions", instruction_text, False,
+                                   self.btn_m_instructions)
+        i.lbl_mb_text.configure(width=50, height=15, anchor='n', justify=LEFT)
 
     def fnc_close(self):
         self.root.destroy()
 
 
-# Message Box Class
-class Message_Box:
+# Instructions and Message Class
+class Instruction_or_Message:
     # Initialize Function
-    def __init__(self, heading, text, footer_text, partner_button):
+    def __init__(self, heading, text, is_results, partner_button):
 
         # Define Formatting Variables
         bg_colour = "white"
@@ -162,7 +152,8 @@ class Message_Box:
             self.partner_button = ""
 
         # White Frame to fill grey
-        self.frm_white = Frame(self.box_mb, width=100, height=200, bg=bg_colour)
+        self.frm_white = Frame(self.box_mb, width=100, height=200,
+                               bg=bg_colour)
         self.frm_white.pack(fill="both", expand=True)
 
         # Main Frame
@@ -210,24 +201,28 @@ class Message_Box:
                                    bg=bg_colour)
         self.frm_mb_footer.grid(row=2)
 
-        # Footer Text (Row 2 / Row 0, Column 0)
-        self.lbl_mb_foottext = Label(self.frm_mb_footer,
-                                     text=footer_text,
-                                     font=("Arial", "16"),
-                                     bg="white",
-                                     fg="black",
-                                     width=30,
-                                     padx=10, pady=10)
-        self.lbl_mb_foottext.grid(row=0)
+        # Only create button if is for results
+        if is_results:
+            # View Past Results Button (Row 2 / Row 0, Column 0)
+            self.btn_m_results = Button(self.frm_mb_footer,
+                                        text="View Past Results",
+                                        font=("Arial", "16", "bold"),
+                                        width=20, height=2,
+                                        padx=1, pady=1,
+                                        command=self.fnc_get_r)
+            self.btn_m_results.grid(row=0, column=0)
 
         # Close Button (Row 2 / Row 0, Column 1)
         self.btn_mb_close = Button(self.frm_mb_footer,
                                    text="Close",
-                                   font=("Arial", "14", "bold"),
-                                   width=10, height=2,
+                                   font=("Arial", "16", "bold"),
+                                   width=20, height=2,
                                    padx=1, pady=1,
                                    command=self.fnc_mb_close)
-        self.btn_mb_close.grid(row=0)
+        self.btn_mb_close.grid(row=0, column=1)
+
+    def fnc_get_r(self):
+        r = Results(self)
 
     def fnc_mb_close(self):
         # Re-enable Help Button
@@ -244,30 +239,8 @@ class Results:
         # Define Formatting Variables
         bg_colour = "white"
 
-        # Disable Button in Menu
-        menu.btn_m_results.configure(state=DISABLED)
-
-        # Read csv file
-        import csv
-        from operator import itemgetter  # For sorting
-
-        # Create Blank List in Which Results are Stored
-        self.lst_results = []
-
-        with open('SUS_Saved_Results.csv', newline='',
-                  encoding='utf-8-sig') as csvfile:  # Open .csv file
-            filereader = csv.reader(csvfile, delimiter=',')
-            lst_results = []
-            for line in filereader:
-                if line:
-                    percentage = (int(line[1]) / (
-                            int(line[1]) + int(line[2]))) * 100
-                    lst_results.append([line[0], int(line[1]), int(line[2]),
-                                        percentage, line[
-                                            3]])  # Create list of items from csv
-        # Sort list results by percentage
-        self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
-                                         reverse=True)
+        # Get and sort results from csv
+        self.fnc_r_get_sort_results()
 
         # Create Window
         self.box_r = Toplevel()
@@ -365,7 +338,8 @@ class Results:
                                        text="",
                                        font=("Arial", "14", "bold"),
                                        bg="white",
-                                       padx=10, pady=10)
+                                       padx=10, pady=10,
+                                       justify=LEFT)
         self.lbl_username_text.grid(row=0, column=0)
 
         # Results Text (Row 3 / Column 1)
@@ -373,7 +347,8 @@ class Results:
                                      text="",
                                      font=("Arial", "14", "bold"),
                                      bg="white",
-                                     padx=10, pady=10)
+                                     padx=10, pady=10,
+                                     justify=LEFT)
         self.lbl_result_text.grid(row=0, column=1)
 
         # Date Text (Row 3 / Column 2)
@@ -381,7 +356,8 @@ class Results:
                                    text="",
                                    font=("Arial", "14", "bold"),
                                    bg="white",
-                                   padx=10, pady=10)
+                                   padx=10, pady=10,
+                                   justify=LEFT)
         self.lbl_date_text.grid(row=0, column=2)
 
         # Footer Frame (Row 3)
@@ -398,23 +374,62 @@ class Results:
                                   command=partial(self.fnc_r_close, menu))
         self.btn_r_close.grid(row=0)
 
-        # Configure Results Text
+        self.fnc_r_get_leaderboard()
+
+    # Function to read csv and get / sort results
+    def fnc_r_get_sort_results(self):
+        # Read csv file
+        import csv
+        from operator import itemgetter  # For sorting
+
+        # Create Blank List in Which Results are Stored
+        self.lst_results = []
+
+        with open('SUS_Saved_Results.csv', newline='',
+                  encoding='utf-8-sig') as csvfile:  # Open .csv file
+            filereader = csv.reader(csvfile, delimiter=',')
+            lst_results = []
+            for line in filereader:
+                if line:
+                    percentage = (int(line[1]) / (
+                            int(line[1]) + int(line[2]))) * 100
+                    lst_results.append([line[0], int(line[1]), int(line[2]),
+                                        percentage, line[
+                                            3]])  # Create list of items from csv
+        # Sort list results by percentage
+        self.lst_sorted_results = sorted(lst_results, key=itemgetter(3),
+                                         reverse=True)
+        # Add index to each for displayed leaderboard placement.
+        index = 0 # Index variable
+        for r in self.lst_sorted_results:
+            index += 1 # Add to index first so no '0' index
+            r.append(index)
+
+    def fnc_r_get_leaderboard(self):
+        # Generate top ten leaderboard
         # Check if results
         usernames = ""
         results = ""
         dates = ""
+        # Check if ten or more results
         if len(self.lst_sorted_results) >= 10:
             for i in range(0, 10):
+                # Build text variables
                 lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
                 usernames += lst[0]
                 results += lst[1]
                 dates += lst[2]
+            # Configure text
             self.fnc_r_configure_text(usernames, results, dates)
+        # If no results
         elif len(self.lst_sorted_results) == 0:
+            # Display unique message
             self.lbl_search_heading.configure(
                 text="There are no saved results",
-                bg="dark blue")
+                bg="red")
+        # if between 0 and 10
         else:
+            # Display all results
             for i in range(0, len(self.lst_sorted_results)):
                 lst = self.fnc_r_lst_to_txt(self.lst_sorted_results[i])
                 usernames += lst[0]
@@ -434,8 +449,8 @@ class Results:
         usernames = ""
         results = ""
         dates = ""
-        for r in lst_matching_results:
-            lst = self.fnc_r_lst_to_txt(r)
+        for i in range(0, len(lst_matching_results)):
+            lst = self.fnc_r_lst_to_txt(lst_matching_results[i])
             usernames += lst[0]
             results += lst[1]
             dates += lst[2]
@@ -456,17 +471,16 @@ class Results:
         self.lbl_date_text.configure(text=date)
 
     def fnc_r_lst_to_txt(self, input):
-        txt_username = "{}\n".format(input[0])
+        txt_username = "{}. {}\n".format(input[5], input[0])
         txt_result = "[ {:.1f}% ({}/{}) ]\n".format(input[3], input[1],
                                                     (input[1] + input[2]))
         txt_dates = "{}\n".format(input[4])
         return txt_username, txt_result, txt_dates
 
     def fnc_r_close(self, menu):
-        # Re-enable Help Button
-        menu.btn_m_results.configure(state=NORMAL)
         # Close Window
         self.box_r.destroy()
+        menu.box_mb.destroy()
 
 
 # Game Class
@@ -699,8 +713,6 @@ class Game:
                                   justify=CENTER)
         self.ent_username.grid(row=1)
 
-
-
     # Save Results Function
     def fnc_save_results(self):
         from datetime import date
@@ -744,7 +756,8 @@ class Game:
                        "{} ({} Correct /{} Incorrect), {}". \
             format(self.username, self.lst_tally[0], self.lst_tally[1],
                    self.today)
-        mb = Message_Box("Save Successful", message_text, "", "")
+        mb = Instruction_or_Message("Save Successful", message_text, True, "")
+        mb.lbl_mb_text.configure(height=5, anchor=N)
 
     # Close Window Function
     def fnc_g_close(self):
